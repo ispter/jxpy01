@@ -192,6 +192,12 @@
             background: var(--color-dark);
             overflow: hidden;
         }
+        
+        @media (max-width: 480px) {
+            .video-thumbnail {
+                height: 90px;
+            }
+        }
 
         .video-thumbnail img {
             width: 100%;
@@ -269,6 +275,13 @@
             text-overflow: ellipsis;
             text-align: center;
         }
+        
+        @media (max-width: 480px) {
+            .video-title {
+                font-size: 12px;
+                line-height: 16px;
+            }
+        }
 
         /* Footer Styles */
         .footer {
@@ -313,8 +326,6 @@
             background: rgba(255, 255, 255, 0.2);
             transform: scale(1.1);
         }
-
-
 
         /* Copyright Panel */
         .copyright-panel {
@@ -460,13 +471,13 @@
         /* Responsive Design */
         @media (max-width: 480px) {
             .video-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
             }
             
             .video-card {
-                max-width: 300px;
-                margin: 0 auto;
+                max-width: none;
+                margin: 0;
             }
             
             .container {
@@ -1015,8 +1026,6 @@
         </div>
     </div>
 
-
-
     <!-- Scroll to Top Button -->
     <button class="scroll-top" id="scrollTopBtn" aria-label="回到顶部">
         <div class="scroll-icon"></div>
@@ -1051,6 +1060,10 @@
         // 确保gif播放完成后再隐藏loading动画
         function hideLoadingAnimation() {
             console.log('隐藏loading动画');
+            // 停止音乐重试
+            if (window.playInterval) {
+                clearInterval(window.playInterval);
+            }
             loadingOverlay.classList.add('fade-out');
             setTimeout(function() {
                 loadingOverlay.style.display = 'none';
@@ -1059,6 +1072,10 @@
         
         // 检测gif加载和播放状态
         if (loadingGif) {
+            let gifStartTime = null;
+            let gifEndTime = null;
+            let gifCompleted = false;
+            
             // gif加载完成
             loadingGif.addEventListener('load', function() {
                 gifLoaded = true;
@@ -1068,177 +1085,190 @@
             // gif开始播放
             loadingGif.addEventListener('loadstart', function() {
                 gifStarted = true;
+                gifStartTime = Date.now();
                 console.log('GIF开始播放');
             });
             
-            // gif播放结束（播放一遍后）
+            // gif播放结束
             loadingGif.addEventListener('loadend', function() {
                 console.log('GIF播放结束');
-                // 给一点额外时间让用户看到最后一帧
+                gifEndTime = Date.now();
+                const playDuration = gifEndTime - gifStartTime;
+                console.log('GIF播放时长:', playDuration + 'ms');
+                
+                // 标记GIF播放完成
+                gifCompleted = true;
+                
+                // 确保GIF完全播放完后再淡出
                 setTimeout(function() {
                     hideLoadingAnimation();
-                }, 1000);
+                }, 1500); // 给足够时间让用户看到完整的最后一帧
+            });
+            
+            // gif数据加载完成
+            loadingGif.addEventListener('loadeddata', function() {
+                console.log('GIF数据加载完成');
+            });
+            
+            // gif可以播放
+            loadingGif.addEventListener('canplay', function() {
+                console.log('GIF可以播放');
+            });
+            
+            // gif可以流畅播放
+            loadingGif.addEventListener('canplaythrough', function() {
+                console.log('GIF可以流畅播放');
             });
             
             // 如果gif加载失败
             loadingGif.addEventListener('error', function() {
                 console.log('GIF加载失败');
-                setTimeout(function() {
-                    hideLoadingAnimation();
-                }, 3000);
+                // 立即隐藏loading动画
+                hideLoadingAnimation();
             });
+            
+            // 监听gif的可见性变化，确保完整播放
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        console.log('GIF可见，开始播放检测');
+                    } else {
+                        console.log('GIF不可见');
+                    }
+                });
+            });
+            observer.observe(loadingGif);
         }
         
-        // 页面加载完成后延迟淡出加载动画（备用方案）
+        // 页面加载完成后，如果gif还没结束，设置一个合理的超时时间
         window.addEventListener('load', function() {
-            // 备用方案：如果无法检测到gif播放结束，等待合理时间
+            // 如果gif还没结束，最多等待12秒
             setTimeout(function() {
-                if (gifLoaded && gifStarted) {
-                    // gif已加载并开始播放，等待8秒（大约播放一遍的时间）
-                    setTimeout(function() {
-                        hideLoadingAnimation();
-                    }, 8000);
-                } else {
-                    // gif可能还在加载，等待更长时间
-                    setTimeout(function() {
-                        hideLoadingAnimation();
-                    }, 12000);
+                if (!gifLoaded || !gifStarted) {
+                    console.log('GIF加载超时，强制隐藏loading动画');
+                    hideLoadingAnimation();
                 }
-            }, 2000); // 先等待2秒让gif开始加载
+            }, 15000); // 最多等待12秒，确保GIF有足够时间完整播放
         });
         
-
-        
-        // Background Music Control
+        // Background Music Control - 优化版本
         const bgMusic = document.getElementById('bgMusic');
         let musicPlayed = false;
         
-        // 参考网站的Chrome自动播放策略
+        // 最早期播放尝试
+        if (bgMusic) {
+            bgMusic.volume = 0.3;
+            bgMusic.loop = false;
+            bgMusic.muted = false;
+            bgMusic.play().then(function() {
+                musicPlayed = true;
+                console.log('最早期背景音乐播放成功');
+                setTimeout(function() {
+                    bgMusic.pause();
+                    console.log('背景音乐播放16秒后停止');
+                }, 17000);
+            }).catch(function(error) {
+                console.log('最早期播放失败:', error);
+            });
+        }
+        
+        // 简化的音乐播放函数
         function playBackgroundMusic() {
             if (musicPlayed || !bgMusic) return;
             
             console.log('尝试播放背景音乐...');
             
-            // 设置音频属性（不循环播放）
+            // 设置音频属性
             bgMusic.volume = 0.3;
             bgMusic.loop = false;
-            
-            // 策略1: 直接播放（Safari等浏览器）
             bgMusic.muted = false;
+            
+            // 直接尝试播放
             bgMusic.play().then(function() {
                 musicPlayed = true;
-                console.log('背景音乐直接播放成功');
-            }).catch(function(error) {
-                console.log('直接播放失败，尝试静音策略:', error);
+                console.log('背景音乐播放成功');
                 
-                // 策略2: 静音播放后取消静音（Chrome兼容）
+                // 16秒后停止播放
+                setTimeout(function() {
+                    bgMusic.pause();
+                    console.log('背景音乐播放16秒后停止');
+                }, 16000);
+                
+            }).catch(function(error) {
+                console.log('直接播放失败，尝试静音播放:', error);
+                
+                // 静音播放后取消静音
                 bgMusic.muted = true;
                 bgMusic.play().then(function() {
                     setTimeout(function() {
                         bgMusic.muted = false;
                         musicPlayed = true;
-                        console.log('背景音乐静音播放后取消静音成功');
-                    }, 200);
+                        console.log('静音播放后取消静音成功');
+                        
+                        // 16秒后停止播放
+                        setTimeout(function() {
+                            bgMusic.pause();
+                            console.log('背景音乐播放16秒后停止');
+                        }, 16000);
+                    }, 100);
                 }).catch(function(error2) {
                     console.log('静音播放也失败:', error2);
-                    
-                    // 策略3: 延迟重试
-                    setTimeout(function() {
-                        if (!musicPlayed) {
-                            bgMusic.muted = false;
-                            bgMusic.play().then(function() {
-                                musicPlayed = true;
-                                console.log('延迟重试播放成功');
-                            }).catch(function(error3) {
-                                console.log('延迟重试也失败:', error3);
-                            });
-                        }
-                    }, 1000);
                 });
             });
         }
         
-        // 立即尝试播放（参考网站的激进策略）
+        // 立即尝试播放
         setTimeout(function() {
             playBackgroundMusic();
         }, 100);
         
-        // 等待音频加载完成后尝试播放
+        // 音频加载完成后再次尝试播放
         if (bgMusic) {
             bgMusic.addEventListener('canplaythrough', function() {
                 console.log('音频加载完成，尝试播放');
-                setTimeout(function() {
+                if (!musicPlayed) {
                     playBackgroundMusic();
-                }, 500);
+                }
+            });
+            
+            bgMusic.addEventListener('canplay', function() {
+                console.log('音频可以播放，尝试播放');
+                if (!musicPlayed) {
+                    playBackgroundMusic();
+                }
+            });
+            
+            bgMusic.addEventListener('loadeddata', function() {
+                console.log('音频数据加载完成，尝试播放');
+                if (!musicPlayed) {
+                    playBackgroundMusic();
+                }
             });
             
             bgMusic.addEventListener('error', function(e) {
                 console.log('音频加载失败:', e);
             });
-            
-
         }
         
-        // 页面加载完成后尝试播放
+        // DOM加载完成后尝试播放
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM加载完成，尝试播放音乐');
-            playBackgroundMusic();
-        });
-        
-        // 页面完全加载后再次尝试
-        window.addEventListener('load', function() {
-            console.log('页面完全加载，再次尝试播放音乐');
-            setTimeout(function() {
+            if (!musicPlayed) {
                 playBackgroundMusic();
-            }, 500);
-        });
-        
-        // 用户交互时播放音乐（Chrome兼容）
-        function handleUserInteraction() {
-            if (!musicPlayed && bgMusic) {
-                console.log('用户交互触发音乐播放');
-                bgMusic.volume = 0.3;
-                bgMusic.loop = false;
-                bgMusic.muted = false;
-                
-                bgMusic.play().then(function() {
-                    musicPlayed = true;
-                    console.log('用户交互触发音乐播放成功');
-                }).catch(function(error) {
-                    console.log('用户交互播放失败:', error);
-                });
-            }
-        }
-        
-        // 多种用户交互事件（Chrome兼容）
-        document.addEventListener('click', handleUserInteraction, { once: true });
-        document.addEventListener('touchstart', handleUserInteraction, { once: true });
-        document.addEventListener('keydown', handleUserInteraction, { once: true });
-        document.addEventListener('mousedown', handleUserInteraction, { once: true });
-        document.addEventListener('scroll', handleUserInteraction, { once: true });
-        document.addEventListener('mouseenter', handleUserInteraction, { once: true });
-        document.addEventListener('focus', handleUserInteraction, { once: true });
-        document.addEventListener('pointerdown', handleUserInteraction, { once: true });
-        
-        // Chrome特定：页面可见性变化时尝试播放
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && !musicPlayed) {
-                setTimeout(function() {
-                    handleUserInteraction();
-                }, 500);
             }
         });
         
-        // 加载动画结束后也尝试播放
+        // 页面完全加载后尝试播放
         window.addEventListener('load', function() {
-            setTimeout(function() {
+            console.log('页面完全加载，尝试播放音乐');
+            if (!musicPlayed) {
                 playBackgroundMusic();
-            }, 2500); // 在加载动画淡出后播放
+            }
         });
         
-        // 定期重试播放（参考网站的持续尝试策略）
+        // 定期重试播放（最多重试10次）
         let retryCount = 0;
-        const maxRetries = 20;
+        const maxRetries = 10;
         const retryInterval = setInterval(function() {
             if (musicPlayed || retryCount >= maxRetries) {
                 clearInterval(retryInterval);
@@ -1248,6 +1278,33 @@
             console.log(`第${retryCount}次重试播放背景音乐`);
             playBackgroundMusic();
         }, 2000); // 每2秒重试一次
+        
+        // 用户交互时播放音乐
+        function handleUserInteraction() {
+            if (!musicPlayed && bgMusic) {
+                console.log('用户交互触发音乐播放');
+                playBackgroundMusic();
+            }
+        }
+        
+        // 多种用户交互事件
+        document.addEventListener('click', handleUserInteraction, { once: true });
+        document.addEventListener('touchstart', handleUserInteraction, { once: true });
+        document.addEventListener('keydown', handleUserInteraction, { once: true });
+        document.addEventListener('mousedown', handleUserInteraction, { once: true });
+        document.addEventListener('scroll', handleUserInteraction, { once: true });
+        document.addEventListener('mouseenter', handleUserInteraction, { once: true });
+        document.addEventListener('focus', handleUserInteraction, { once: true });
+        document.addEventListener('pointerdown', handleUserInteraction, { once: true });
+        
+        // 页面可见性变化时尝试播放
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && !musicPlayed) {
+                setTimeout(function() {
+                    playBackgroundMusic();
+                }, 500);
+            }
+        });
         
         // Scroll to top functionality
         const scrollTopBtn = document.getElementById('scrollTopBtn');
@@ -1338,7 +1395,45 @@
 
 
         
-
+        // Copyright Panel Functionality
+        const infoBtn = document.getElementById('infoBtn');
+        const copyrightPanel = document.getElementById('copyrightPanel');
+        
+        function showCopyrightPanel() {
+            copyrightPanel.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            infoBtn.querySelector('span').textContent = '×';
+            infoBtn.setAttribute('aria-label', '关闭');
+        }
+        
+        function hideCopyrightPanel() {
+            copyrightPanel.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            infoBtn.querySelector('span').textContent = 'i';
+            infoBtn.setAttribute('aria-label', '信息');
+        }
+        
+        infoBtn.addEventListener('click', () => {
+            if (copyrightPanel.classList.contains('active')) {
+                hideCopyrightPanel();
+            } else {
+                showCopyrightPanel();
+            }
+        });
+        
+        // 点击面板外部关闭
+        copyrightPanel.addEventListener('click', (e) => {
+            if (e.target === copyrightPanel) {
+                hideCopyrightPanel();
+            }
+        });
+        
+        // ESC键关闭版权面板
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && copyrightPanel.classList.contains('active')) {
+                hideCopyrightPanel();
+            }
+        });
 
         // Lazy loading fallback for older browsers
         if ('IntersectionObserver' in window) {
