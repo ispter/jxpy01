@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>皮影艺术展示 - 传承千年的光影艺术</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for Design Tokens */
+        :root {
+            --color-primary: #1C1917;
+            --color-background: #F5F5F4;
+            --color-secondary: #D1D5DB;
+            --color-dark: #1F2937;
+            --color-accent: rgba(180, 83, 9, 0.9);
+            --color-overlay: rgba(28, 25, 23, 0.8);
+            --color-white: #FFFFFF;
+            --color-gray: #9CA3AF;
+            
+            /* Fonts */
+            --font-primary: "Dancing Script", cursive;
+            --font-secondary: "Roboto", sans-serif;
+            
+            /* Shadows */
+            --shadow-card: 0px 2px 10px 0px rgba(0, 0, 0, 0.2);
+            --shadow-header: 0px 4px 20px 0px rgba(0, 0, 0, 0.3);
+            --shadow-button: 0px 8px 30px 0px rgba(0, 0, 0, 0.4);
+            
+            /* Border Radius */
+            --radius-card: 12px;
+            --radius-button: 9999px;
+            --radius-small: 4px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image: url('images/bg.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 16px 80px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Top Line Animation */
+        .top-line-animation {
+            position: relative;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            height: 140px;
+            background: linear-gradient(90deg, transparent, rgba(180, 83, 9, 0.1), transparent);
+            overflow: hidden;
+            background-image: url('images/line.png');
+            background-size: auto 140px;
+            background-repeat: repeat-x;
+            background-position: left center;
+        }
+
+        .top-overlay-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 100px;
+            width: auto;
+            max-width: 90%;
+            z-index: 1001;
+            opacity: 0.9;
+            object-fit: contain;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .top-line-animation {
+                height: 100px;
+            }
+            
+            .top-overlay-image {
+                height: 80px;
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .video-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-family: var(--font-primary);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-background);
+            text-align: center;
+            margin-bottom: 8px;
+            padding: 8px 0;
+            border-bottom: 2px solid var(--color-accent);
+            position: relative;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: var(--color-accent);
+        }
+
+        .section-title-image {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        .section-title-image img {
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+
+        @media (max-width: 480px) {
+            .section-title-image img {
+                max-width: 90%;
+                min-width: 200px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .section-title-image img {
+                max-width: 80%;
+                min-width: 300px;
+            }
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        /* Video Card Styles */
+        .video-card {
+            background: rgba(0, 0, 0, 0.001);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0px 8px 25px 0px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            height: 113.625px;
+            background: var(--color-dark);
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-card:hover .video-overlay {
+            opacity: 1;
+        }
+
+        .play-button {
+            width: 48px;
+            height: 48px;
+            background: var(--color-accent);
+            border-radius: var(--radius-button);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 12px solid var(--color-white);
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            margin-left: 3px;
+        }
+
+        .duration-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: var(--color-overlay);
+            color: var(--color-background);
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: var(--radius-small);
+            font-weight: 400;
+            line-height: 16px;
+        }
+
+        .video-info {
+            background: var(--color-dark);
+            padding: 8px;
+        }
+
+        .video-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-background);
+            line-height: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        /* Footer Styles */
+        .footer {
+            text-align: center;
+            padding: 24px 0 32px;
+            margin-top: auto;
+        }
+
+
+
+        .footer p {
+            font-size: 12px;
+            color: #8B4513;
+            line-height: 16px;
+        }
+
+
+
+        /* Info Icon */
+        .info-icon {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0 0 0 12px;
+            color: var(--color-background);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 1002;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .info-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+
+
+        /* Copyright Panel */
+        .copyright-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: rgba(28, 25, 23, 0.95);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 99;
+            overflow-y: auto;
+        }
+
+        .copyright-panel.active {
+            right: 0;
+        }
+
+        .copyright-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright-title {
+            font-family: var(--font-primary);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-background);
+            margin: 0;
+        }
+
+        .close-copyright {
+            background: none;
+            border: none;
+            color: var(--color-background);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-copyright:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .copyright-content {
+            padding: 24px;
+            color: var(--color-background);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .copyright-section {
+            margin-bottom: 24px;
+        }
+
+        .copyright-section h3 {
+            color: var(--color-accent);
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--color-accent);
+            padding-bottom: 4px;
+        }
+
+        .copyright-section p {
+            margin: 0 0 12px 0;
+        }
+
+        .copyright-section ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .copyright-section li {
+            margin: 4px 0;
+        }
+
+        .copyright-section .contact {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .copyright-panel {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        /* Scroll to Top Button */
+        .scroll-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.001), #B45309);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-button);
+            color: var(--color-white);
+            cursor: pointer;
+            box-shadow: var(--shadow-button);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .scroll-icon {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 8px solid var(--color-white);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .video-card {
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .container {
+                max-width: 320px;
+            }
+
+            .section-title {
+                font-size: 18px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+            }
+            
+            .video-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+        }
+
+        /* Loading Video Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('images/bg.jpg') center center;
+            background-size: cover;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease;
+        }
+
+        .loading-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-animation {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Loading Animation */
+        .video-thumbnail::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Video Player Modal */
+        .video-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .video-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .video-modal-content {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-modal iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--color-white);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .video-modal-content {
+                width: 95%;
+                margin: 20px;
+            }
+            
+            .close-modal {
+                top: -50px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Animation Overlay -->
+    <div id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:url('images/bg.jpg') center center;background-size:cover;z-index:9999;display:flex;align-items:center;justify-content:center;">
+        <img src="images/111.gif" style="max-width:100%;max-height:100%;object-fit:contain;" />
+        <div style="display:none"><audio id="bgMusic" src="mp3/bg.mp3" preload="auto"></audio></div>
+    </div>
+
+    
+    <div class="container">
+        <!-- Top Line Animation -->
+        <div class="top-line-animation">
+            <img src="images/jxpy.png" alt="京西皮影" class="top-overlay-image">
+        </div>
+
+        <!-- Main Content Grid -->
+        <main class="main-content">
+            <!-- 皮影课 Section -->
+            <section class="video-section">
+                <div class="section-title-image">
+                    <img src="images/title01.png" alt="皮影课" loading="lazy">
+                </div>
+                <div class="video-grid">
+                    <!-- Video Card 1 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996574952101&bvid=BV1T2tszKEP4&cid=31579244146&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/01.jpg" alt="皮影博物馆参观" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">18:59</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">皮影博物馆参观</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 2 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996574953446&bvid=BV1K2tszKESN&cid=31579246503&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/02.jpg" alt="皮影艺术赏析" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">20:12</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">皮影艺术赏析</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 3 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996625284268&bvid=BV13vtszCEBx&cid=31579442982&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/03.jpg" alt="学习皮影人物设计" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">25:08</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">学习皮影人物设计</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 4 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996658904504&bvid=BV18BtszrE1T&cid=31579505507&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/04.jpg" alt="学习皮影染色" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">16:28</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">学习皮影染色</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 5 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996658838961&bvid=BV1gBtszrEjE&cid=31579506100&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/05.jpg" alt="动感皮影教具制作" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">10:12</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">动感皮影教具制作</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 6 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996658903971&bvid=BV1hBtszrEGZ&cid=31579506699&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/06.jpg" alt="学习皮影操纵" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">04:26</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">学习皮影操纵</h3>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- 传统故事 Section -->
+            <section class="video-section">
+                <div class="section-title-image">
+                    <img src="images/title02.png" alt="传统故事" loading="lazy">
+                </div>
+                <div class="video-grid">
+
+                    <!-- Video Card 7 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996659036059&bvid=BV1gBtszkEQG&cid=31579506972&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/07.jpg" alt="盗仙草" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">12:43</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">盗仙草</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 8 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996658969490&bvid=BV1DBtszrErN&cid=31579507366&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/08.jpg" alt="芒砀山传奇" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">11:50</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">芒砀山传奇</h3>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- 古都故事 Section -->
+            <section class="video-section">
+                <div class="section-title-image">
+                    <img src="images/title03.png" alt="古都故事" loading="lazy">
+                </div>
+                <div class="video-grid">
+
+                    <!-- Video Card 9 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996658969451&bvid=BV1DBtszrEkQ&cid=31579507873&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/09.jpg" alt="智擒鳌拜" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">10:22</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">智擒鳌拜</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 10 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996658838631&bvid=BV1gBtszrEVE&cid=31579508354&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/10.jpg" alt="曹雪芹与白家疃" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">15:58</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">曹雪芹与白家疃</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 11 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996658838359&bvid=BV1gBtszrEyp&cid=31579570703&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/11.jpg" alt="京西稻传说" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">08:03</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">京西稻传说</h3>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- 红色故事 Section -->
+            <section class="video-section">
+                <div class="section-title-image">
+                    <img src="images/title04.png" alt="红色故事" loading="lazy">
+                </div>
+                <div class="video-grid">
+
+                    <!-- Video Card 12 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996658838347&bvid=BV1gBtszrEy4&cid=31579571245&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/12.jpg" alt="红色金库" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">15:07</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">红色金库</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 13 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996658969669&bvid=BV1DBtszrEgz&cid=31579571888&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/13.jpg" alt="贝熙业在西山" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">23:18</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">贝熙业在西山</h3>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- 石景山传说 Section -->
+            <section class="video-section">
+                <div class="section-title-image">
+                    <img src="images/title05.png" alt="石景山传说" loading="lazy">
+                </div>
+                <div class="video-grid">
+
+                    <!-- Video Card 14 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996642062230&bvid=BV1u6tszgErf&cid=31579572790&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/14.jpg" alt="石景山传说" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">26:32</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">石景山传说</h3>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- 媒体报道 Section -->
+            <section class="video-section">
+                <div class="section-title-image">
+                    <img src="images/title06.png" alt="媒体报道" loading="lazy">
+                </div>
+                <div class="video-grid">
+                    <!-- Video Card 15 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996642126771&bvid=BV186tszgE8w&cid=31579636195&p=1">
+                        <div class="video-thumbnail">
+                            <img src="images/15.jpg" alt="“皮影”与“袖珍人”" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">17:30</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">“皮影”与“袖珍人”</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 16 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放本地视频" 
+                             data-video-src="videos/01.mp4">
+                        <div class="video-thumbnail">
+                            <img src="images/16.jpg" alt="石景山传说" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">19:59</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">"影人姐姐"和她的"小"演员们（上）</h3>
+                        </div>
+                    </article>
+
+                    <!-- Video Card 17 -->
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放本地视频" 
+                             data-video-src="videos/02.mp4">
+                        <div class="video-thumbnail">
+                            <img src="images/17.jpg" alt="石景山传说" loading="lazy">
+                            <div class="video-overlay">
+                                <div class="play-button">
+                                    <div class="play-icon"></div>
+                                </div>
+                            </div>
+                            <span class="duration-badge">19:59</span>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">"影人姐姐"和她的"小"演员们（下）</h3>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="footer">
+            <p>© 2025 北京宣传文化引导基金资助项目 · 版权所有</p>
+        </footer>
+    </div>
+
+
+
+    <!-- Info Icon -->
+    <button class="info-icon" id="infoBtn" aria-label="信息">
+        <span>i</span>
+    </button>
+
+    <!-- Copyright Panel -->
+    <div class="copyright-panel" id="copyrightPanel">
+        <div class="copyright-header">
+            <h3 class="copyright-title">版权信息</h3>
+        </div>
+        <div class="copyright-content">
+            <div class="copyright-section">
+                <h3>《京西皮影》</h3>
+                <p>北京宣传文化引导基金资助项目</p>
+                <p>ISBN 978-7-89418-309-5</p>
+            </div>
+            
+            <div class="copyright-section">
+                <h3>出版信息</h3>
+                <p><strong>出版：</strong>北京联合出版公司</p>
+                <p><strong>策划：</strong>传妙工作室</p>
+                <p><strong>展演：</strong>北京龙在天皮影艺术剧院（中国京西皮影非遗园）</p>
+                <p><strong>设计：</strong>吕燕茹</p>
+                <p><strong>责编：</strong>张佳</p>
+                <p><strong>出版日期：</strong>2025年8月</p>
+            </div>
+            
+            <div class="copyright-section">
+                <h3>版权声明</h3>
+                <p><strong>版权所有，侵权必究</strong></p>
+                <p>本作品受中华人民共和国著作权法保护，未经授权，禁止任何形式的复制、传播、改编或商业使用。</p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" aria-label="回到顶部">
+        <div class="scroll-icon"></div>
+    </button>
+
+    <!-- Video Player Modal -->
+    <div id="videoModal" class="video-modal">
+        <div class="video-modal-content">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <iframe id="videoPlayer" 
+                    src="" 
+                    scrolling="no" 
+                    border="0" 
+                    frameborder="no" 
+                    framespacing="0" 
+                    allowfullscreen="true">
+            </iframe>
+            <video id="localVideoPlayer" controls style="display: none; width: 100%; height: 100%;">
+                <source src="" type="video/mp4">
+                您的浏览器不支持视频播放。
+            </video>
+        </div>
+    </div>
+
+    <script>
+        // Loading Animation Control
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingGif = loadingOverlay.querySelector('img');
+        let gifLoaded = false;
+        let gifStarted = false;
+        
+        // 确保gif播放完成后再隐藏loading动画
+        function hideLoadingAnimation() {
+            console.log('隐藏loading动画');
+            loadingOverlay.classList.add('fade-out');
+            setTimeout(function() {
+                loadingOverlay.style.display = 'none';
+            }, 1000);
+        }
+        
+        // 检测gif加载和播放状态
+        if (loadingGif) {
+            // gif加载完成
+            loadingGif.addEventListener('load', function() {
+                gifLoaded = true;
+                console.log('GIF加载完成');
+            });
+            
+            // gif开始播放
+            loadingGif.addEventListener('loadstart', function() {
+                gifStarted = true;
+                console.log('GIF开始播放');
+            });
+            
+            // gif播放结束（播放一遍后）
+            loadingGif.addEventListener('loadend', function() {
+                console.log('GIF播放结束');
+                // 给一点额外时间让用户看到最后一帧
+                setTimeout(function() {
+                    hideLoadingAnimation();
+                }, 1000);
+            });
+            
+            // 如果gif加载失败
+            loadingGif.addEventListener('error', function() {
+                console.log('GIF加载失败');
+                setTimeout(function() {
+                    hideLoadingAnimation();
+                }, 3000);
+            });
+        }
+        
+        // 页面加载完成后延迟淡出加载动画（备用方案）
+        window.addEventListener('load', function() {
+            // 备用方案：如果无法检测到gif播放结束，等待合理时间
+            setTimeout(function() {
+                if (gifLoaded && gifStarted) {
+                    // gif已加载并开始播放，等待8秒（大约播放一遍的时间）
+                    setTimeout(function() {
+                        hideLoadingAnimation();
+                    }, 8000);
+                } else {
+                    // gif可能还在加载，等待更长时间
+                    setTimeout(function() {
+                        hideLoadingAnimation();
+                    }, 12000);
+                }
+            }, 2000); // 先等待2秒让gif开始加载
+        });
+        
+
+        
+        // Background Music Control
+        const bgMusic = document.getElementById('bgMusic');
+        let musicPlayed = false;
+        
+        // 参考网站的Chrome自动播放策略
+        function playBackgroundMusic() {
+            if (musicPlayed || !bgMusic) return;
+            
+            console.log('尝试播放背景音乐...');
+            
+            // 设置音频属性（不循环播放）
+            bgMusic.volume = 0.3;
+            bgMusic.loop = false;
+            
+            // 策略1: 直接播放（Safari等浏览器）
+            bgMusic.muted = false;
+            bgMusic.play().then(function() {
+                musicPlayed = true;
+                console.log('背景音乐直接播放成功');
+            }).catch(function(error) {
+                console.log('直接播放失败，尝试静音策略:', error);
+                
+                // 策略2: 静音播放后取消静音（Chrome兼容）
+                bgMusic.muted = true;
+                bgMusic.play().then(function() {
+                    setTimeout(function() {
+                        bgMusic.muted = false;
+                        musicPlayed = true;
+                        console.log('背景音乐静音播放后取消静音成功');
+                    }, 200);
+                }).catch(function(error2) {
+                    console.log('静音播放也失败:', error2);
+                    
+                    // 策略3: 延迟重试
+                    setTimeout(function() {
+                        if (!musicPlayed) {
+                            bgMusic.muted = false;
+                            bgMusic.play().then(function() {
+                                musicPlayed = true;
+                                console.log('延迟重试播放成功');
+                            }).catch(function(error3) {
+                                console.log('延迟重试也失败:', error3);
+                            });
+                        }
+                    }, 1000);
+                });
+            });
+        }
+        
+        // 立即尝试播放（参考网站的激进策略）
+        setTimeout(function() {
+            playBackgroundMusic();
+        }, 100);
+        
+        // 等待音频加载完成后尝试播放
+        if (bgMusic) {
+            bgMusic.addEventListener('canplaythrough', function() {
+                console.log('音频加载完成，尝试播放');
+                setTimeout(function() {
+                    playBackgroundMusic();
+                }, 500);
+            });
+            
+            bgMusic.addEventListener('error', function(e) {
+                console.log('音频加载失败:', e);
+            });
+            
+
+        }
+        
+        // 页面加载完成后尝试播放
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM加载完成，尝试播放音乐');
+            playBackgroundMusic();
+        });
+        
+        // 页面完全加载后再次尝试
+        window.addEventListener('load', function() {
+            console.log('页面完全加载，再次尝试播放音乐');
+            setTimeout(function() {
+                playBackgroundMusic();
+            }, 500);
+        });
+        
+        // 用户交互时播放音乐（Chrome兼容）
+        function handleUserInteraction() {
+            if (!musicPlayed && bgMusic) {
+                console.log('用户交互触发音乐播放');
+                bgMusic.volume = 0.3;
+                bgMusic.loop = false;
+                bgMusic.muted = false;
+                
+                bgMusic.play().then(function() {
+                    musicPlayed = true;
+                    console.log('用户交互触发音乐播放成功');
+                }).catch(function(error) {
+                    console.log('用户交互播放失败:', error);
+                });
+            }
+        }
+        
+        // 多种用户交互事件（Chrome兼容）
+        document.addEventListener('click', handleUserInteraction, { once: true });
+        document.addEventListener('touchstart', handleUserInteraction, { once: true });
+        document.addEventListener('keydown', handleUserInteraction, { once: true });
+        document.addEventListener('mousedown', handleUserInteraction, { once: true });
+        document.addEventListener('scroll', handleUserInteraction, { once: true });
+        document.addEventListener('mouseenter', handleUserInteraction, { once: true });
+        document.addEventListener('focus', handleUserInteraction, { once: true });
+        document.addEventListener('pointerdown', handleUserInteraction, { once: true });
+        
+        // Chrome特定：页面可见性变化时尝试播放
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && !musicPlayed) {
+                setTimeout(function() {
+                    handleUserInteraction();
+                }, 500);
+            }
+        });
+        
+        // 加载动画结束后也尝试播放
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                playBackgroundMusic();
+            }, 2500); // 在加载动画淡出后播放
+        });
+        
+        // 定期重试播放（参考网站的持续尝试策略）
+        let retryCount = 0;
+        const maxRetries = 20;
+        const retryInterval = setInterval(function() {
+            if (musicPlayed || retryCount >= maxRetries) {
+                clearInterval(retryInterval);
+                return;
+            }
+            retryCount++;
+            console.log(`第${retryCount}次重试播放背景音乐`);
+            playBackgroundMusic();
+        }, 2000); // 每2秒重试一次
+        
+        // Scroll to top functionality
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        });
+        
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Video Modal Elements
+        const videoModal = document.getElementById('videoModal');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const localVideoPlayer = document.getElementById('localVideoPlayer');
+        const closeModal = document.getElementById('closeModal');
+
+        // Video card click handlers
+        document.querySelectorAll('.video-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const title = card.querySelector('.video-title').textContent;
+                const videoEmbed = card.getAttribute('data-video-embed');
+                const videoSrc = card.getAttribute('data-video-src');
+                
+                if (videoEmbed) {
+                    // 如果有嵌入代码，在弹窗中播放
+                    videoPlayer.style.display = 'block';
+                    localVideoPlayer.style.display = 'none';
+                    videoPlayer.src = videoEmbed;
+                    videoModal.classList.add('active');
+                    document.body.style.overflow = 'hidden'; // 禁止背景滚动
+                } else if (videoSrc) {
+                    // 如果有本地视频源，在弹窗中播放
+                    videoPlayer.style.display = 'none';
+                    localVideoPlayer.style.display = 'block';
+                    localVideoPlayer.querySelector('source').src = videoSrc;
+                    localVideoPlayer.load();
+                    videoModal.classList.add('active');
+                    document.body.style.overflow = 'hidden'; // 禁止背景滚动
+                } else {
+                    // 否则显示提示
+                    alert(`即将播放: ${title}`);
+                }
+            });
+            
+            // Keyboard accessibility
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
+            });
+        });
+
+        // 关闭弹窗功能
+        function closeVideoModal() {
+            videoModal.classList.remove('active');
+            videoPlayer.src = ''; // 停止视频播放
+            localVideoPlayer.pause(); // 暂停本地视频
+            localVideoPlayer.currentTime = 0; // 重置本地视频时间
+            document.body.style.overflow = 'auto'; // 恢复背景滚动
+        }
+
+        // 关闭按钮点击事件
+        closeModal.addEventListener('click', closeVideoModal);
+
+        // 点击弹窗背景关闭
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) {
+                closeVideoModal();
+            }
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && videoModal.classList.contains('active')) {
+                closeVideoModal();
+            }
+        });
+
+
+        
+
+
+        // Lazy loading fallback for older browsers
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src || img.src;
+                        img.classList.remove('lazy');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+
+            document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+                imageObserver.observe(img);
+            });
+        }
+    </script>
+</body>
+</html>
+
+
