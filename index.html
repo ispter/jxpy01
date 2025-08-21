@@ -666,7 +666,7 @@
                 <div class="video-grid">
                     <!-- Video Card 1 -->
                     <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
-                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996574952101&bvid=BV1T2tszKEP4&cid=31579244146&p=1">
+                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996574952101&bvid=BV1T2tszKEP4&cid=31579244146&p=1&autoplay=1&muted=1">
                         <div class="video-thumbnail">
                             <img src="images/01.jpg" alt="皮影博物馆参观" loading="lazy">
                             <div class="video-overlay">
@@ -1263,15 +1263,15 @@
             }
         }
         
-        // 监听用户交互事件
-        document.addEventListener('click', handleUserInteraction, { once: true });
-        document.addEventListener('touchstart', handleUserInteraction, { once: true });
-        document.addEventListener('keydown', handleUserInteraction, { once: true });
-        document.addEventListener('mousedown', handleUserInteraction, { once: true });
-        document.addEventListener('scroll', handleUserInteraction, { once: true });
-        document.addEventListener('mouseenter', handleUserInteraction, { once: true });
-        document.addEventListener('focus', handleUserInteraction, { once: true });
-        document.addEventListener('pointerdown', handleUserInteraction, { once: true });
+        // 监听用户交互事件（移除once限制，允许多次触发）
+        document.addEventListener('click', handleUserInteraction);
+        document.addEventListener('touchstart', handleUserInteraction);
+        document.addEventListener('keydown', handleUserInteraction);
+        document.addEventListener('mousedown', handleUserInteraction);
+        document.addEventListener('scroll', handleUserInteraction);
+        document.addEventListener('mouseenter', handleUserInteraction);
+        document.addEventListener('focus', handleUserInteraction);
+        document.addEventListener('pointerdown', handleUserInteraction);
         
         // 立即尝试播放（页面开始加载时）
         if (bgMusic) {
@@ -1317,6 +1317,22 @@
             }, 1000); // 减少延迟到1秒
         });
         
+        // 定期重试播放（最多重试5次，每次间隔3秒）
+        let retryCount = 0;
+        const maxRetries = 5;
+        const retryInterval = setInterval(function() {
+            if (musicPlayed || retryCount >= maxRetries) {
+                clearInterval(retryInterval);
+                if (retryCount >= maxRetries) {
+                    console.log('达到最大重试次数，停止自动播放尝试');
+                }
+                return;
+            }
+            retryCount++;
+            console.log(`第${retryCount}次重试播放背景音乐`);
+            playBackgroundMusic();
+        }, 3000); // 每3秒重试一次
+        
         // Scroll to top functionality
         const scrollTopBtn = document.getElementById('scrollTopBtn');
         
@@ -1352,7 +1368,17 @@
                     // 如果有嵌入代码，在弹窗中播放
                     videoPlayer.style.display = 'block';
                     localVideoPlayer.style.display = 'none';
-                    videoPlayer.src = videoEmbed;
+                    
+                    // 检查是否是B站视频，尝试添加自动播放参数
+                    let embedUrl = videoEmbed;
+                    if (embedUrl.includes('bilibili.com')) {
+                        if (!embedUrl.includes('autoplay=1')) {
+                            embedUrl += '&autoplay=1&muted=1';
+                        }
+                        console.log('B站视频，尝试自动播放');
+                    }
+                    
+                    videoPlayer.src = embedUrl;
                     videoModal.classList.add('active');
                     document.body.style.overflow = 'hidden'; // 禁止背景滚动
                 } else if (videoSrc) {
