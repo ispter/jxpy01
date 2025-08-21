@@ -947,8 +947,8 @@
                     </article>
 
                     <!-- Video Card 16 -->
-                    <article class="video-card" role="button" tabindex="0" aria-label="播放本地视频" 
-                             data-video-src="videos/01.mp4">
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放官网视频" 
+                    data-video-src="https://stream.iqilu.com/vod_bag_2016//2023/12/05/f4671aceb9174ab9ad4806b155ba7f73/f4671aceb9174ab9ad4806b155ba7f73_H264_mp4_500K.mp4">
                         <div class="video-thumbnail">
                             <img src="images/16.jpg" alt="石景山传说" loading="lazy">
                             <div class="video-overlay">
@@ -964,8 +964,8 @@
                     </article>
 
                     <!-- Video Card 17 -->
-                    <article class="video-card" role="button" tabindex="0" aria-label="播放本地视频" 
-                             data-video-src="videos/02.mp4">
+                    <article class="video-card" role="button" tabindex="0" aria-label="播放官网视频" 
+                             data-video-src="https://stream5.iqilu.com/vod_bag_2016//2023/12/12/dc547df590324b8c905958d47a4492d1/dc547df590324b8c905958d47a4492d1_H264_mp4_500K.mp4">
                         <div class="video-thumbnail">
                             <img src="images/17.jpg" alt="石景山传说" loading="lazy">
                             <div class="video-overlay">
@@ -1151,28 +1151,22 @@
             }, 15000); // 最多等待12秒，确保GIF有足够时间完整播放
         });
         
-        // Background Music Control - 优化版本
+        // Background Music Control - 简化版本
         const bgMusic = document.getElementById('bgMusic');
         let musicPlayed = false;
         
-        // 最早期播放尝试
-        if (bgMusic) {
-            bgMusic.volume = 0.3;
-            bgMusic.loop = false;
-            bgMusic.muted = false;
-            bgMusic.play().then(function() {
-                musicPlayed = true;
-                console.log('最早期背景音乐播放成功');
-                setTimeout(function() {
-                    bgMusic.pause();
-                    console.log('背景音乐播放16秒后停止');
-                }, 17000);
-            }).catch(function(error) {
-                console.log('最早期播放失败:', error);
-            });
+        // 检测微信浏览器
+        function isWeChat() {
+            const ua = navigator.userAgent.toLowerCase();
+            return ua.indexOf('micromessenger') !== -1;
         }
         
-        // 简化的音乐播放函数
+        // 检测移动设备
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        
+        // 音乐播放函数
         function playBackgroundMusic() {
             if (musicPlayed || !bgMusic) return;
             
@@ -1181,113 +1175,78 @@
             // 设置音频属性
             bgMusic.volume = 0.3;
             bgMusic.loop = false;
-            bgMusic.muted = false;
             
-            // 直接尝试播放
-            bgMusic.play().then(function() {
-                musicPlayed = true;
-                console.log('背景音乐播放成功');
-                
-                // 16秒后停止播放
-                setTimeout(function() {
-                    bgMusic.pause();
-                    console.log('背景音乐播放16秒后停止');
-                }, 16000);
-                
-            }).catch(function(error) {
-                console.log('直接播放失败，尝试静音播放:', error);
-                
-                // 静音播放后取消静音
+            // 微信浏览器特殊处理
+            if (isWeChat()) {
+                console.log('检测到微信浏览器，使用特殊播放策略');
+                // 微信浏览器需要用户交互才能播放，先静音播放
                 bgMusic.muted = true;
                 bgMusic.play().then(function() {
+                    console.log('微信浏览器静音播放成功');
+                    // 微信中保持静音播放，用户点击后取消静音
+                    musicPlayed = true;
+                    
+                    // 16秒后停止播放
                     setTimeout(function() {
-                        bgMusic.muted = false;
-                        musicPlayed = true;
-                        console.log('静音播放后取消静音成功');
-                        
-                        // 16秒后停止播放
-                        setTimeout(function() {
-                            bgMusic.pause();
-                            console.log('背景音乐播放16秒后停止');
-                        }, 16000);
-                    }, 100);
+                        bgMusic.pause();
+                        console.log('背景音乐播放16秒后停止');
+                    }, 16000);
+                }).catch(function(error) {
+                    console.log('微信浏览器播放失败:', error);
+                });
+                return;
+            }
+            
+            // 其他浏览器的播放策略
+            // 先尝试静音播放（Chrome允许静音自动播放）
+            bgMusic.muted = true;
+            bgMusic.play().then(function() {
+                console.log('静音播放成功，准备取消静音');
+                // 延迟取消静音
+                setTimeout(function() {
+                    bgMusic.muted = false;
+                    musicPlayed = true;
+                    console.log('背景音乐播放成功（取消静音）');
+                    
+                    // 16秒后停止播放
+                    setTimeout(function() {
+                        bgMusic.pause();
+                        console.log('背景音乐播放16秒后停止');
+                    }, 16000);
+                }, 100);
+                
+            }).catch(function(error) {
+                console.log('静音播放失败，尝试非静音播放:', error);
+                // 如果静音播放失败，尝试非静音播放
+                bgMusic.muted = false;
+                bgMusic.play().then(function() {
+                    musicPlayed = true;
+                    console.log('背景音乐播放成功');
+                    
+                    // 16秒后停止播放
+                    setTimeout(function() {
+                        bgMusic.pause();
+                        console.log('背景音乐播放16秒后停止');
+                    }, 16000);
                 }).catch(function(error2) {
-                    console.log('静音播放也失败:', error2);
+                    console.log('非静音播放也失败:', error2);
                 });
             });
         }
-        
-        // 立即尝试播放
-        setTimeout(function() {
-            playBackgroundMusic();
-        }, 100);
-        
-        // 音频加载完成后再次尝试播放
-        if (bgMusic) {
-            bgMusic.addEventListener('canplaythrough', function() {
-                console.log('音频加载完成，尝试播放');
-                if (!musicPlayed) {
-                    playBackgroundMusic();
-                }
-            });
-            
-            bgMusic.addEventListener('canplay', function() {
-                console.log('音频可以播放，尝试播放');
-                if (!musicPlayed) {
-                    playBackgroundMusic();
-                }
-            });
-            
-            bgMusic.addEventListener('loadeddata', function() {
-                console.log('音频数据加载完成，尝试播放');
-                if (!musicPlayed) {
-                    playBackgroundMusic();
-                }
-            });
-            
-            bgMusic.addEventListener('error', function(e) {
-                console.log('音频加载失败:', e);
-            });
-        }
-        
-        // DOM加载完成后尝试播放
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM加载完成，尝试播放音乐');
-            if (!musicPlayed) {
-                playBackgroundMusic();
-            }
-        });
-        
-        // 页面完全加载后尝试播放
-        window.addEventListener('load', function() {
-            console.log('页面完全加载，尝试播放音乐');
-            if (!musicPlayed) {
-                playBackgroundMusic();
-            }
-        });
-        
-        // 定期重试播放（最多重试10次）
-        let retryCount = 0;
-        const maxRetries = 10;
-        const retryInterval = setInterval(function() {
-            if (musicPlayed || retryCount >= maxRetries) {
-                clearInterval(retryInterval);
-                return;
-            }
-            retryCount++;
-            console.log(`第${retryCount}次重试播放背景音乐`);
-            playBackgroundMusic();
-        }, 2000); // 每2秒重试一次
         
         // 用户交互时播放音乐
         function handleUserInteraction() {
             if (!musicPlayed && bgMusic) {
                 console.log('用户交互触发音乐播放');
                 playBackgroundMusic();
+            } else if (musicPlayed && bgMusic && isWeChat() && bgMusic.muted) {
+                // 微信浏览器中，如果音乐正在静音播放，用户交互时取消静音
+                console.log('微信浏览器用户交互，取消静音');
+                bgMusic.muted = false;
             }
         }
         
-        // 多种用户交互事件
+        // 监听用户交互事件
         document.addEventListener('click', handleUserInteraction, { once: true });
         document.addEventListener('touchstart', handleUserInteraction, { once: true });
         document.addEventListener('keydown', handleUserInteraction, { once: true });
@@ -1297,13 +1256,48 @@
         document.addEventListener('focus', handleUserInteraction, { once: true });
         document.addEventListener('pointerdown', handleUserInteraction, { once: true });
         
-        // 页面可见性变化时尝试播放
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && !musicPlayed) {
-                setTimeout(function() {
-                    playBackgroundMusic();
-                }, 500);
+        // 立即尝试播放（页面开始加载时）
+        if (bgMusic) {
+            setTimeout(function() {
+                playBackgroundMusic();
+                
+                // 微信浏览器提示
+                if (isWeChat() && !musicPlayed) {
+                    console.log('微信浏览器检测到，音乐将在用户交互后播放');
+                }
+            }, 100);
+        }
+        
+        // DOM加载完成后尝试播放
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!musicPlayed && bgMusic) {
+                console.log('DOM加载完成，尝试播放音乐');
+                playBackgroundMusic();
             }
+        });
+        
+        // 页面加载完成后自动触发用户交互
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (!musicPlayed && bgMusic) {
+                    console.log('页面加载完成，自动触发音乐播放');
+                    // 直接调用播放函数
+                    playBackgroundMusic();
+                    
+                    // 如果直接播放失败，尝试触发用户交互
+                    setTimeout(function() {
+                        if (!musicPlayed) {
+                            console.log('直接播放失败，尝试触发用户交互');
+                            const clickEvent = new MouseEvent('click', {
+                                view: window,
+                                bubbles: true,
+                                cancelable: true
+                            });
+                            document.dispatchEvent(clickEvent);
+                        }
+                    }, 500);
+                }
+            }, 1000); // 减少延迟到1秒
         });
         
         // Scroll to top functionality
@@ -1350,6 +1344,10 @@
                     localVideoPlayer.style.display = 'block';
                     localVideoPlayer.querySelector('source').src = videoSrc;
                     localVideoPlayer.load();
+                    // 自动播放视频
+                    localVideoPlayer.play().catch(e => {
+                        console.log('自动播放失败，可能需要用户交互:', e);
+                    });
                     videoModal.classList.add('active');
                     document.body.style.overflow = 'hidden'; // 禁止背景滚动
                 } else {
