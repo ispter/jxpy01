@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>京西皮影</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Roboto:wght@400;500&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=ZCOOL+KuaiLe&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
     <style>
         /* CSS Variables for Design Tokens */
         :root {
@@ -628,6 +628,37 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
+        @keyframes shineLoop {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                box-shadow: 0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2), 0 0 20px rgba(255,215,0,0.3);
+            }
+            50% { 
+                box-shadow: 0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2), 0 0 30px rgba(255,215,0,0.6);
+            }
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes borderGlow {
+            0% { 
+                border-color: rgba(255,215,0,0.3);
+                box-shadow: 0 0 10px rgba(255,215,0,0.3);
+            }
+            100% { 
+                border-color: rgba(255,215,0,0.8);
+                box-shadow: 0 0 20px rgba(255,215,0,0.6);
+            }
+        }
 
         @media (max-width: 768px) {
             .video-modal-content {
@@ -643,10 +674,25 @@
     </style>
 </head>
 <body>
-    <!-- Loading Animation Overlay -->
-    <div id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:url('images/bg.jpg') center center;background-size:cover;z-index:9999;display:flex;align-items:center;justify-content:center;">
-        <img src="images/111.gif" style="max-width:100%;max-height:100%;object-fit:contain;" />
+    <!-- Welcome Overlay -->
+    <div id="welcomeOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:url('images/bg.jpg') center center;background-size:cover;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div style="text-align:center;color:white;margin-bottom:40px;">
+            <img src="images/jxpy.png" alt="京西皮影" style="max-width:300px;width:100%;height:auto;margin-bottom:20px;filter:drop-shadow(2px 2px 4px rgba(0,0,0,0.7));">
+            <p style="font-size:16px;color:#8B4513;text-shadow:1px 1px 2px rgba(0,0,0,0.3);">探索千年非遗文化的魅力，感受光影交织的传统艺术</p>
+        </div>
+        <button id="enterBtn" style="padding:12px 40px;font-size:18px;background:linear-gradient(135deg, #8B4513, #A0522D, #CD853F);color:#F5DEB3;border:2px solid #654321;border-radius:6px;cursor:pointer;box-shadow:0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2), 0 0 20px rgba(255,215,0,0.3);transition:all 0.3s ease;font-weight:bold;font-family:'Dancing Script', cursive;text-shadow:1px 1px 2px rgba(0,0,0,0.7);position:relative;overflow:hidden;min-height:45px;animation:pulse 2s ease-in-out infinite;">
+            <span style="position:relative;z-index:2;display:block;line-height:1.2;">点击进入</span>
+            <div style="position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);animation:shineLoop 3s ease-in-out infinite;"></div>
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139,69,19,0.1) 2px, rgba(139,69,19,0.1) 4px);opacity:0.4;pointer-events:none;"></div>
+            <div style="position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);animation:rotate 4s linear infinite;pointer-events:none;"></div>
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;border:2px solid transparent;border-radius:6px;background:linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent) border-box;animation:borderGlow 2s ease-in-out infinite alternate;pointer-events:none;"></div>
+        </button>
         <div style="display:none"><audio id="bgMusic" src="mp3/bg.mp3" preload="auto"></audio></div>
+    </div>
+
+    <!-- Loading Animation Overlay (Hidden initially) -->
+    <div id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:url('images/bg.jpg') center center;background-size:cover;z-index:9998;display:none;align-items:center;justify-content:center;">
+        <img src="images/111.gif" style="max-width:100%;max-height:100%;object-fit:contain;" />
     </div>
 
     
@@ -1184,7 +1230,7 @@
         }
         
         // 音乐播放函数
-        function playBackgroundMusic() {
+        function startBackgroundMusic() {
             if (musicPlayed || !bgMusic) return;
             
             console.log('尝试播放背景音乐...');
@@ -1251,87 +1297,105 @@
             });
         }
         
-        // 用户交互时播放音乐
-        function handleUserInteraction() {
-            if (!musicPlayed && bgMusic) {
-                console.log('用户交互触发音乐播放');
-                playBackgroundMusic();
-            } else if (musicPlayed && bgMusic && isWeChat() && bgMusic.muted) {
-                // 微信浏览器中，如果音乐正在静音播放，用户交互时取消静音
-                console.log('微信浏览器用户交互，取消静音');
-                bgMusic.muted = false;
-            }
-        }
+        // 进入按钮点击事件
+        const enterBtn = document.getElementById('enterBtn');
+        const welcomeOverlay = document.getElementById('welcomeOverlay');
         
-        // 监听用户交互事件（移除once限制，允许多次触发）
-        document.addEventListener('click', handleUserInteraction);
-        document.addEventListener('touchstart', handleUserInteraction);
-        document.addEventListener('keydown', handleUserInteraction);
-        document.addEventListener('mousedown', handleUserInteraction);
-        document.addEventListener('scroll', handleUserInteraction);
-        document.addEventListener('mouseenter', handleUserInteraction);
-        document.addEventListener('focus', handleUserInteraction);
-        document.addEventListener('pointerdown', handleUserInteraction);
-        
-        // 立即尝试播放（页面开始加载时）
-        if (bgMusic) {
-            setTimeout(function() {
-                playBackgroundMusic();
+        if (enterBtn) {
+            enterBtn.addEventListener('click', function() {
+                console.log('用户点击进入按钮');
                 
-                // 微信浏览器提示
-                if (isWeChat() && !musicPlayed) {
-                    console.log('微信浏览器检测到，音乐将在用户交互后播放');
+                // 隐藏欢迎界面
+                welcomeOverlay.style.display = 'none';
+                
+                // 显示加载动画
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'flex';
                 }
-            }, 100);
+                
+                // 开始播放音乐和动画
+                startMusicAndAnimation();
+            });
+            
+            // 添加按钮悬停效果
+            enterBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.03) translateY(-1px)';
+                this.style.boxShadow = '0 6px 16px rgba(139,69,19,0.7), inset 0 1px 3px rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.3)';
+                this.style.background = 'linear-gradient(135deg, #A0522D, #CD853F, #DEB887)';
+                this.style.color = '#FFF8DC';
+            });
+            
+            enterBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) translateY(0)';
+                this.style.boxShadow = '0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2)';
+                this.style.background = 'linear-gradient(135deg, #8B4513, #A0522D, #CD853F)';
+                this.style.color = '#F5DEB3';
+            });
         }
         
-        // DOM加载完成后尝试播放
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!musicPlayed && bgMusic) {
-                console.log('DOM加载完成，尝试播放音乐');
-                playBackgroundMusic();
-            }
-        });
+        // 音乐和动画启动函数
+        function startMusicAndAnimation() {
+            console.log('开始播放音乐和动画');
+            
+            // 启动音乐播放
+            startBackgroundMusic();
+            
+            // 启动GIF动画
+            startGifAnimation();
+        }
         
-        // 页面加载完成后自动触发用户交互
-        window.addEventListener('load', function() {
+        // 启动GIF动画
+        function startGifAnimation() {
+            const loadingGif = document.querySelector('#loadingOverlay img');
+            if (!loadingGif) return;
+            
+            let gifStartTime = null;
+            let gifEndTime = null;
+            let gifCompleted = false;
+            
+            // gif加载完成
+            loadingGif.addEventListener('load', function() {
+                console.log('GIF加载完成');
+            });
+            
+            // gif开始播放
+            loadingGif.addEventListener('loadstart', function() {
+                gifStartTime = Date.now();
+                console.log('GIF开始播放');
+            });
+            
+            // gif播放结束
+            loadingGif.addEventListener('loadend', function() {
+                console.log('GIF播放结束');
+                gifEndTime = Date.now();
+                const playDuration = gifEndTime - gifStartTime;
+                console.log('GIF播放时长:', playDuration + 'ms');
+                
+                // 标记GIF播放完成
+                gifCompleted = true;
+                
+                // 确保GIF完全播放完后再淡出
+                setTimeout(function() {
+                    hideLoadingAnimation();
+                }, 1500); // 给足够时间让用户看到完整的最后一帧
+            });
+            
+            // 如果gif加载失败
+            loadingGif.addEventListener('error', function() {
+                console.log('GIF加载失败');
+                // 立即隐藏loading动画
+                hideLoadingAnimation();
+            });
+            
+            // 设置超时时间
             setTimeout(function() {
-                if (!musicPlayed && bgMusic) {
-                    console.log('页面加载完成，自动触发音乐播放');
-                    // 直接调用播放函数
-                    playBackgroundMusic();
-                    
-                    // 如果直接播放失败，尝试触发用户交互
-                    setTimeout(function() {
-                        if (!musicPlayed) {
-                            console.log('直接播放失败，尝试触发用户交互');
-                            const clickEvent = new MouseEvent('click', {
-                                view: window,
-                                bubbles: true,
-                                cancelable: true
-                            });
-                            document.dispatchEvent(clickEvent);
-                        }
-                    }, 500);
+                if (!gifCompleted) {
+                    console.log('GIF播放超时，强制隐藏loading动画');
+                    hideLoadingAnimation();
                 }
-            }, 1000); // 减少延迟到1秒
-        });
-        
-        // 定期重试播放（最多重试5次，每次间隔3秒）
-        let retryCount = 0;
-        const maxRetries = 5;
-        const retryInterval = setInterval(function() {
-            if (musicPlayed || retryCount >= maxRetries) {
-                clearInterval(retryInterval);
-                if (retryCount >= maxRetries) {
-                    console.log('达到最大重试次数，停止自动播放尝试');
-                }
-                return;
-            }
-            retryCount++;
-            console.log(`第${retryCount}次重试播放背景音乐`);
-            playBackgroundMusic();
-        }, 3000); // 每3秒重试一次
+            }, 15000); // 最多等待15秒
+        }
         
         // Scroll to top functionality
         const scrollTopBtn = document.getElementById('scrollTopBtn');
