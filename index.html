@@ -5,14 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>京西皮影</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/icon.jpg">
+    <link rel="shortcut icon" type="image/x-icon" href="images/icon.jpg">
+    <link rel="apple-touch-icon" href="images/icon.jpg">
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="">
     <meta property="og:title" content="京西皮影">
     <meta property="og:description" content="探索千年非遗文化的魅力，感受光影交织的传统艺术">
     <meta property="og:image" content="images/icon.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:image:width" content="300">
+    <meta property="og:image:height" content="300">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:alt" content="京西皮影图标">
+    <meta property="og:site_name" content="京西皮影">
+    <meta property="og:locale" content="zh_CN">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
@@ -20,6 +29,7 @@
     <meta property="twitter:title" content="京西皮影">
     <meta property="twitter:description" content="探索千年非遗文化的魅力，感受光影交织的传统艺术">
     <meta property="twitter:image" content="images/icon.jpg">
+    <meta property="twitter:image:alt" content="京西皮影图标">
     
     <!-- 微信分享 -->
     <meta name="description" content="探索千年非遗文化的魅力，感受光影交织的传统艺术">
@@ -28,6 +38,12 @@
     
     <!-- 微信分享图片 -->
     <meta name="share-image" content="images/icon.jpg">
+    
+    <!-- 额外的微信分享优化 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="京西皮影">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Roboto:wght@400;500&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=ZCOOL+KuaiLe&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
     <style>
         /* CSS Variables for Design Tokens */
@@ -1160,6 +1176,31 @@
     </div>
 
     <script>
+        // 动态设置分享图片的绝对路径
+        function setShareImageUrl() {
+            const currentUrl = window.location.origin;
+            const imageUrl = currentUrl + '/images/icon.jpg';
+            
+            // 更新所有分享相关的meta标签
+            const ogImage = document.querySelector('meta[property="og:image"]');
+            const twitterImage = document.querySelector('meta[property="twitter:image"]');
+            const shareImage = document.querySelector('meta[name="share-image"]');
+            const ogUrl = document.querySelector('meta[property="og:url"]');
+            const twitterUrl = document.querySelector('meta[property="twitter:url"]');
+            
+            if (ogImage) ogImage.setAttribute('content', imageUrl);
+            if (twitterImage) twitterImage.setAttribute('content', imageUrl);
+            if (shareImage) shareImage.setAttribute('content', imageUrl);
+            if (ogUrl) ogUrl.setAttribute('content', window.location.href);
+            if (twitterUrl) twitterUrl.setAttribute('content', window.location.href);
+            
+            console.log('分享图片URL已设置为:', imageUrl);
+            console.log('页面URL已设置为:', window.location.href);
+        }
+        
+        // 页面加载时设置分享图片URL
+        setShareImageUrl();
+        
         // Loading Animation Control
         const loadingOverlay = document.getElementById('loadingOverlay');
         const loadingGif = loadingOverlay.querySelector('img');
