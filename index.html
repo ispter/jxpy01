@@ -49,6 +49,16 @@
             background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        /* 微信浏览器特殊处理 */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                min-height: -webkit-fill-available;
+            }
         }
 
         .container {
@@ -675,7 +685,7 @@
 </head>
 <body>
     <!-- Welcome Overlay -->
-    <div id="welcomeOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:url('images/bg.jpg') center center;background-size:cover;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <div id="welcomeOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);background:url('images/bg.jpg') center center;background-size:cover;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
         <div style="text-align:center;color:white;margin-bottom:40px;">
             <img src="images/jxpy.png" alt="京西皮影" style="max-width:300px;width:100%;height:auto;margin-bottom:20px;filter:drop-shadow(2px 2px 4px rgba(0,0,0,0.7));">
             <p style="font-size:16px;color:#8B4513;text-shadow:1px 1px 2px rgba(0,0,0,0.3);">探索千年非遗文化的魅力，感受光影交织的传统艺术</p>
@@ -691,8 +701,8 @@
     </div>
 
     <!-- Loading Animation Overlay (Hidden initially) -->
-    <div id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:url('images/bg.jpg') center center;background-size:cover;z-index:9998;display:none;align-items:center;justify-content:center;">
-        <img src="images/111.gif" style="max-width:100%;max-height:100%;object-fit:contain;" />
+    <div id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);background:url('images/bg.jpg') center center;background-size:cover;z-index:9998;display:none;align-items:center;justify-content:center;overflow:hidden;">
+        <img src="images/111.gif" style="max-width:100%;max-height:100%;object-fit:contain;display:block;" />
     </div>
 
     
@@ -1373,6 +1383,20 @@
             // 微信中预加载音频，但不播放
             bgMusic.load();
             bgMusic.muted = true;
+        }
+        
+        // 微信浏览器视口处理
+        if (isWeChat()) {
+            console.log('微信浏览器视口处理');
+            // 设置视口高度
+            function setViewportHeight() {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+            
+            setViewportHeight();
+            window.addEventListener('resize', setViewportHeight);
+            window.addEventListener('orientationchange', setViewportHeight);
         }
         
         // 启动GIF动画
