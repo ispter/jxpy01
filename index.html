@@ -1246,8 +1246,15 @@
                 bgMusic.muted = true;
                 bgMusic.play().then(function() {
                     console.log('微信浏览器静音播放成功');
-                    // 微信中保持静音播放，用户点击后取消静音
                     musicPlayed = true;
+                    
+                    // 微信中延迟取消静音，给用户交互时间
+                    setTimeout(function() {
+                        if (bgMusic && !bgMusic.paused) {
+                            bgMusic.muted = false;
+                            console.log('微信浏览器取消静音成功');
+                        }
+                    }, 1000);
                     
                     // 16秒后停止播放
                     setTimeout(function() {
@@ -1256,6 +1263,13 @@
                     }, 16000);
                 }).catch(function(error) {
                     console.log('微信浏览器播放失败:', error);
+                    // 如果静音播放也失败，尝试其他方法
+                    setTimeout(function() {
+                        if (!musicPlayed) {
+                            console.log('微信浏览器重试播放');
+                            startBackgroundMusic();
+                        }
+                    }, 1000);
                 });
                 return;
             }
@@ -1316,6 +1330,14 @@
                 
                 // 开始播放音乐和动画
                 startMusicAndAnimation();
+                
+                // 微信浏览器特殊处理：用户点击后取消静音
+                if (isWeChat() && bgMusic && bgMusic.muted) {
+                    console.log('微信浏览器用户交互，取消静音');
+                    setTimeout(function() {
+                        bgMusic.muted = false;
+                    }, 500);
+                }
             });
             
             // 添加按钮悬停效果
@@ -1343,6 +1365,14 @@
             
             // 启动GIF动画
             startGifAnimation();
+        }
+        
+        // 微信浏览器预加载音频
+        if (isWeChat() && bgMusic) {
+            console.log('微信浏览器预加载音频');
+            // 微信中预加载音频，但不播放
+            bgMusic.load();
+            bgMusic.muted = true;
         }
         
         // 启动GIF动画
