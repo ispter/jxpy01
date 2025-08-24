@@ -738,11 +738,17 @@
 <body>
     <!-- Welcome Overlay -->
     <div id="welcomeOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);background:url('images/bg.jpg') center center;background-size:cover;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
-        <div style="text-align:center;color:white;margin-bottom:40px;">
-            <img src="images/jxpy.png" alt="京西皮影" style="max-width:300px;width:100%;height:auto;margin-bottom:20px;filter:drop-shadow(2px 2px 4px rgba(0,0,0,0.7));">
-            <p style="font-size:16px;color:#8B4513;text-shadow:1px 1px 2px rgba(0,0,0,0.3);">探索千年非遗文化的魅力，感受光影交织的传统艺术</p>
+        <!-- Loading GIF Container -->
+        <div id="loadingContainer" style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 1s ease;z-index:1;">
+            <img src="images/loading.gif" alt="加载动画" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(2px 2px 4px rgba(0,0,0,0.7));">
         </div>
-        <button id="enterBtn" style="padding:12px 40px;font-size:18px;background:linear-gradient(135deg, #8B4513, #A0522D, #CD853F);color:#F5DEB3;border:2px solid #654321;border-radius:6px;cursor:pointer;box-shadow:0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2), 0 0 20px rgba(255,215,0,0.3);transition:all 0.3s ease;font-weight:bold;font-family:'Dancing Script', cursive;text-shadow:1px 1px 2px rgba(0,0,0,0.7);position:relative;overflow:hidden;min-height:45px;animation:pulse 2s ease-in-out infinite;">
+        
+        <!-- Title and Description -->
+        <div id="titleContainer" style="text-align:center;color:white;margin-bottom:40px;opacity:0;transition:opacity 1s ease;position:relative;z-index:2;">
+        </div>
+        
+        <!-- Enter Button -->
+        <button id="enterBtn" style="padding:12px 40px;font-size:18px;background:linear-gradient(135deg, #8B4513, #A0522D, #CD853F);color:#F5DEB3;border:2px solid #654321;border-radius:6px;cursor:pointer;box-shadow:0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2), 0 0 20px rgba(255,215,0,0.3);transition:all 0.3s ease;font-weight:bold;font-family:'Dancing Script', cursive;text-shadow:1px 1px 2px rgba(0,0,0,0.7);position:relative;overflow:hidden;min-height:45px;animation:pulse 2s ease-in-out infinite;opacity:0;transform:translateY(280px);z-index:2;">
             <span style="position:relative;z-index:2;display:block;line-height:1.2;">点击进入</span>
             <div style="position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);animation:shineLoop 3s ease-in-out infinite;"></div>
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139,69,19,0.1) 2px, rgba(139,69,19,0.1) 4px);opacity:0.4;pointer-events:none;"></div>
@@ -753,8 +759,8 @@
     </div>
 
     <!-- Loading Animation Overlay (Hidden initially) -->
-    <div id="loadingOverlay" class="loading-overlay" style="display:none;">
-        <img src="images/111.gif" alt="加载动画" />
+    <div id="loadingOverlay" class="loading-overlay" style="display:none;opacity:1;">
+        <img src="images/111.gif" alt="加载动画" id="loadingGif" />
     </div>
 
     
@@ -1055,8 +1061,8 @@
                 </div>
                 <div class="video-grid">
                     <!-- Video Card 15 -->
-                    <article class="video-card" role="button" tabindex="0" aria-label="播放B站视频" 
-                             data-video-embed="https://player.bilibili.com/player.html?isOutside=true&aid=114996642126771&bvid=BV186tszgE8w&cid=31579636195&p=1">
+                    <article class="video-card" role="button" tabindex="0" aria-label="打开CCTV视频" 
+                             data-external-link="https://tv.cctv.com/2024/03/24/VIDEr0bN96pibYuTkjz5iaOn240324.shtml">
                         <div class="video-thumbnail">
                             <img src="images/15.jpg" alt="“皮影”与“袖珍人”" loading="lazy">
                             <div class="video-overlay">
@@ -1110,7 +1116,7 @@
 
         <!-- Footer Section -->
         <footer class="footer">
-            <p>© 2025 北京宣传文化引导基金资助项目 · 版权所有</p>
+            <p>探索千年非遗文化的魅力  感受光影交织的传统艺术</p>
         </footer>
     </div>
 
@@ -1201,9 +1207,14 @@
         // 页面加载时设置分享图片URL
         setShareImageUrl();
         
-        // Loading Animation Control
+        // Welcome Page Animation Control
+        const loadingContainer = document.getElementById('loadingContainer');
+        const titleContainer = document.getElementById('titleContainer');
+        const enterBtn = document.getElementById('enterBtn');
+        const welcomeOverlay = document.getElementById('welcomeOverlay');
         const loadingOverlay = document.getElementById('loadingOverlay');
-        const loadingGif = loadingOverlay.querySelector('img');
+        const loadingGif = document.getElementById('loadingGif');
+        
         let gifLoaded = false;
         let gifStarted = false;
         
@@ -1214,91 +1225,69 @@
             if (window.playInterval) {
                 clearInterval(window.playInterval);
             }
-            loadingOverlay.classList.add('fade-out');
+            // 添加淡出动画
+            loadingOverlay.style.transition = 'opacity 1s ease';
+            loadingOverlay.style.opacity = '0';
             setTimeout(function() {
                 loadingOverlay.style.display = 'none';
             }, 1000);
         }
         
-        // 检测gif加载和播放状态
-        if (loadingGif) {
-            let gifStartTime = null;
-            let gifEndTime = null;
-            let gifCompleted = false;
-            
-            // gif加载完成
-            loadingGif.addEventListener('load', function() {
-                gifLoaded = true;
-                console.log('GIF加载完成');
-            });
-            
-            // gif开始播放
-            loadingGif.addEventListener('loadstart', function() {
-                gifStarted = true;
-                gifStartTime = Date.now();
-                console.log('GIF开始播放');
-            });
-            
-            // gif播放结束
-            loadingGif.addEventListener('loadend', function() {
-                console.log('GIF播放结束');
-                gifEndTime = Date.now();
-                const playDuration = gifEndTime - gifStartTime;
-                console.log('GIF播放时长:', playDuration + 'ms');
-                
-                // 标记GIF播放完成
-                gifCompleted = true;
-                
-                // 确保GIF完全播放完后再淡出
-                setTimeout(function() {
-                    hideLoadingAnimation();
-                }, 1500); // 给足够时间让用户看到完整的最后一帧
-            });
-            
-            // gif数据加载完成
-            loadingGif.addEventListener('loadeddata', function() {
-                console.log('GIF数据加载完成');
-            });
-            
-            // gif可以播放
-            loadingGif.addEventListener('canplay', function() {
-                console.log('GIF可以播放');
-            });
-            
-            // gif可以流畅播放
-            loadingGif.addEventListener('canplaythrough', function() {
-                console.log('GIF可以流畅播放');
-            });
-            
-            // 如果gif加载失败
-            loadingGif.addEventListener('error', function() {
-                console.log('GIF加载失败');
-                // 立即隐藏loading动画
-                hideLoadingAnimation();
-            });
-            
-            // 监听gif的可见性变化，确保完整播放
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting) {
-                        console.log('GIF可见，开始播放检测');
-                    } else {
-                        console.log('GIF不可见');
-                    }
-                });
-            });
-            observer.observe(loadingGif);
-        }
-        
-        // 页面加载完成后，如果gif还没结束，设置一个合理的超时时间
+        // 页面加载完成后的动画序列
         window.addEventListener('load', function() {
-            // 如果gif还没结束，最多等待12秒
+            console.log('页面加载完成，开始动画序列');
+            
+            // 第一步：显示loading.gif并监听播放完成
             setTimeout(function() {
-                if (!gifLoaded || !gifStarted) {
-                    console.log('GIF加载超时，强制隐藏loading动画');
-                    hideLoadingAnimation();
+                if (loadingContainer) {
+                    loadingContainer.style.opacity = '1';
+                    console.log('显示loading.gif');
+                    
+                    // 获取loading.gif图片元素
+                    const loadingImg = loadingContainer.querySelector('img');
+                    if (loadingImg) {
+                        let gifPlayed = false;
+                        
+                        // 监听GIF播放完成
+                        loadingImg.addEventListener('loadstart', function() {
+                            console.log('loading.gif开始播放');
+                        });
+                        
+                        loadingImg.addEventListener('loadend', function() {
+                            if (!gifPlayed) {
+                                gifPlayed = true;
+                                console.log('loading.gif播放完成，停止播放');
+                                // 停止GIF播放（通过重新设置src来停止）
+                                loadingImg.style.animationPlayState = 'paused';
+                                // 或者可以隐藏loading.gif
+                                // loadingContainer.style.opacity = '0';
+                            }
+                        });
+                        
+                        // 如果GIF加载失败，也继续后续动画
+                        loadingImg.addEventListener('error', function() {
+                            console.log('loading.gif加载失败');
+                        });
+                    }
                 }
-            }, 15000); // 最多等待12秒，确保GIF有足够时间完整播放
+            }, 500);
+            
+            // 第二步：显示标题和描述
+            setTimeout(function() {
+                if (titleContainer) {
+                    titleContainer.style.opacity = '1';
+                    console.log('显示标题和描述');
+                }
+            }, 1500);
+            
+            // 第三步：按钮淡入到下半部分
+            setTimeout(function() {
+                if (enterBtn) {
+                    enterBtn.style.opacity = '1';
+                    enterBtn.style.transform = 'translateY(230px)';
+                    console.log('按钮淡入到下半部分');
+                }
+            }, 2500);
         });
         
         // Background Music Control - 简化版本
@@ -1399,8 +1388,6 @@
         }
         
         // 进入按钮点击事件
-        const enterBtn = document.getElementById('enterBtn');
-        const welcomeOverlay = document.getElementById('welcomeOverlay');
         
         if (enterBtn) {
             enterBtn.addEventListener('click', function() {
@@ -1409,14 +1396,19 @@
                 // 隐藏欢迎界面
                 welcomeOverlay.style.display = 'none';
                 
-                // 显示加载动画
-                const loadingOverlay = document.getElementById('loadingOverlay');
+                // 显示加载动画并播放111.gif
                 if (loadingOverlay) {
                     loadingOverlay.style.display = 'flex';
+                    loadingOverlay.style.opacity = '1';
                 }
                 
                 // 开始播放音乐和动画
                 startMusicAndAnimation();
+                
+                // 确保显示111.gif（在设置监听器之后）
+                if (loadingGif) {
+                    loadingGif.src = 'images/111.gif';
+                }
                 
                 // 微信浏览器特殊处理：用户点击后取消静音
                 if (isWeChat() && bgMusic && bgMusic.muted) {
@@ -1429,14 +1421,14 @@
             
             // 添加按钮悬停效果
             enterBtn.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.03) translateY(-1px)';
+                this.style.transform = 'scale(1.03) translateY(230px)';
                 this.style.boxShadow = '0 6px 16px rgba(139,69,19,0.7), inset 0 1px 3px rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.3)';
                 this.style.background = 'linear-gradient(135deg, #A0522D, #CD853F, #DEB887)';
                 this.style.color = '#FFF8DC';
             });
             
             enterBtn.addEventListener('mouseleave', function() {
-                this.style.transform = 'scale(1) translateY(0)';
+                this.style.transform = 'scale(1) translateY(230px)';
                 this.style.boxShadow = '0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2)';
                 this.style.background = 'linear-gradient(135deg, #8B4513, #A0522D, #CD853F)';
                 this.style.color = '#F5DEB3';
@@ -1478,54 +1470,65 @@
         
         // 启动GIF动画
         function startGifAnimation() {
-            const loadingGif = document.querySelector('#loadingOverlay img');
             if (!loadingGif) return;
             
-            let gifStartTime = null;
-            let gifEndTime = null;
-            let gifCompleted = false;
+            console.log('开始设置111.gif监听器');
             
-            // gif加载完成
-            loadingGif.addEventListener('load', function() {
-                console.log('GIF加载完成');
-            });
-            
-            // gif开始播放
-            loadingGif.addEventListener('loadstart', function() {
-                gifStartTime = Date.now();
-                console.log('GIF开始播放');
-            });
-            
-            // gif播放结束
-            loadingGif.addEventListener('loadend', function() {
-                console.log('GIF播放结束');
-                gifEndTime = Date.now();
-                const playDuration = gifEndTime - gifStartTime;
-                console.log('GIF播放时长:', playDuration + 'ms');
+            // 监听111.gif的播放完成
+            function setupGifListeners() {
+                // gif加载完成
+                loadingGif.addEventListener('load', function onLoad() {
+                    console.log('111.gif加载完成');
+                    loadingGif.removeEventListener('load', onLoad);
+                });
                 
-                // 标记GIF播放完成
-                gifCompleted = true;
+                // gif开始播放
+                loadingGif.addEventListener('loadstart', function onLoadStart() {
+                    console.log('111.gif开始播放');
+                    loadingGif.removeEventListener('loadstart', onLoadStart);
+                });
                 
-                // 确保GIF完全播放完后再淡出
-                setTimeout(function() {
+                // gif播放结束
+                loadingGif.addEventListener('loadend', function onLoadEnd() {
+                    console.log('111.gif播放结束');
+                    // 延迟2秒后淡出，确保GIF完全播放完成
+                    setTimeout(function() {
+                        console.log('延迟2秒后开始淡出');
+                        hideLoadingAnimation();
+                    }, 2000);
+                    loadingGif.removeEventListener('loadend', onLoadEnd);
+                });
+                
+                // 如果gif加载失败
+                loadingGif.addEventListener('error', function onError() {
+                    console.log('111.gif加载失败');
+                    // 立即隐藏loading动画
                     hideLoadingAnimation();
-                }, 1500); // 给足够时间让用户看到完整的最后一帧
-            });
+                    loadingGif.removeEventListener('error', onError);
+                });
+                
+                // 添加更多事件监听器来确保捕获播放完成
+                loadingGif.addEventListener('canplay', function() {
+                    console.log('111.gif可以播放');
+                });
+                
+                loadingGif.addEventListener('canplaythrough', function() {
+                    console.log('111.gif可以流畅播放');
+                });
+                
+                loadingGif.addEventListener('loadeddata', function() {
+                    console.log('111.gif数据加载完成');
+                });
+            }
             
-            // 如果gif加载失败
-            loadingGif.addEventListener('error', function() {
-                console.log('GIF加载失败');
-                // 立即隐藏loading动画
-                hideLoadingAnimation();
-            });
+            // 设置监听器
+            setupGifListeners();
             
-            // 设置超时时间
+            // 设置一个备用超时，防止事件没有触发
             setTimeout(function() {
-                if (!gifCompleted) {
-                    console.log('GIF播放超时，强制隐藏loading动画');
-                    hideLoadingAnimation();
-                }
-            }, 15000); // 最多等待15秒
+                console.log('备用超时：111.gif播放10秒后强制淡出');
+                hideLoadingAnimation();
+            }, 10000); // 10秒后强制淡出
         }
         
         // Scroll to top functionality
@@ -1558,8 +1561,12 @@
                 const title = card.querySelector('.video-title').textContent;
                 const videoEmbed = card.getAttribute('data-video-embed');
                 const videoSrc = card.getAttribute('data-video-src');
+                const externalLink = card.getAttribute('data-external-link');
                 
-                if (videoEmbed) {
+                if (externalLink) {
+                    // 如果是外部链接，在新窗口打开
+                    window.open(externalLink, '_blank');
+                } else if (videoEmbed) {
                     // 如果有嵌入代码，在弹窗中播放
                     videoPlayer.style.display = 'block';
                     localVideoPlayer.style.display = 'none';
