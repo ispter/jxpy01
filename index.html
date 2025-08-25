@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>京西皮影</title>
     
     <!-- Favicon -->
@@ -44,6 +44,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="京西皮影">
+    
+    <!-- 预加载关键资源 -->
+    <link rel="preload" href="images/bg.jpg" as="image">
+    <link rel="preload" href="images/jxpy.png" as="image">
+    <link rel="preload" href="images/loading.gif" as="image">
+    <link rel="preload" href="mp3/bg.mp3" as="audio" crossorigin>
+    
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Roboto:wght@400;500&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=ZCOOL+KuaiLe&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
     <style>
         /* CSS Variables for Design Tokens */
@@ -84,14 +91,20 @@
             color: var(--color-white);
             line-height: 1.6;
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            /* 固定背景设置 - 固定在浏览器视窗 */
             background-image: url('images/bg.jpg');
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
+            /* 移动端优化 */
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
         
         /* 微信浏览器特殊处理 */
@@ -100,6 +113,36 @@
                 min-height: -webkit-fill-available;
             }
         }
+        
+        /* 移动端背景优化 */
+        @media (max-width: 768px) {
+            body {
+                background-attachment: fixed;
+                background-size: cover;
+                background-position: center center;
+                /* 移动端硬件加速 */
+                -webkit-transform: translate3d(0, 0, 0);
+                transform: translate3d(0, 0, 0);
+                -webkit-perspective: 1000;
+                perspective: 1000;
+                /* 图片渲染优化 */
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+                image-rendering: pixelated;
+                /* 防止背景重新渲染 */
+                will-change: auto;
+                -webkit-will-change: auto;
+            }
+            
+            /* 当弹窗打开时保持背景清晰 */
+            body.modal-open {
+                background-attachment: fixed !important;
+                -webkit-transform: translate3d(0, 0, 0) !important;
+                transform: translate3d(0, 0, 0) !important;
+            }
+        }
+        
+
 
         .container {
             max-width: 1000px;
@@ -580,16 +623,31 @@
             height: 100%;
             background: url('images/bg.jpg') center center;
             background-size: cover;
+            background-repeat: no-repeat;
             z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: opacity 1s ease;
+            /* 移动端优化 */
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         .loading-overlay.fade-out {
             opacity: 0;
             pointer-events: none;
+        }
+        
+        /* 移动端loading overlay优化 */
+        @media (max-width: 768px) {
+            .loading-overlay {
+                background-attachment: scroll;
+                -webkit-transform: translate3d(0, 0, 0);
+                transform: translate3d(0, 0, 0);
+            }
         }
 
         .loading-animation {
@@ -741,14 +799,14 @@
     <!-- Welcome Overlay -->
     <div id="welcomeOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);background:url('images/bg.jpg') center center;background-size:cover;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
         <!-- Loading GIF Container -->
-        <div id="loadingContainer" style="position:absolute;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 1s ease;z-index:1;">
+        <div id="loadingContainer" style="position:absolute;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity 1s ease;z-index:1;">
             <img src="images/loading.gif" alt="加载动画" style="width:auto;height:100%;object-fit:contain;filter:drop-shadow(2px 2px 4px rgba(0,0,0,0.7));">
         </div>
         
 
         
         <!-- Enter Button -->
-        <button id="enterBtn" style="padding:12px 40px;font-size:18px;background:linear-gradient(135deg, #8B4513, #A0522D, #CD853F);color:#F5DEB3;border:2px solid #654321;border-radius:6px;cursor:pointer;box-shadow:0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2), 0 0 20px rgba(255,215,0,0.3);transition:all 0.3s ease;font-weight:bold;font-family:'Dancing Script', cursive;text-shadow:1px 1px 2px rgba(0,0,0,0.7);position:absolute;overflow:hidden;min-height:45px;animation:pulse 2s ease-in-out infinite;opacity:0;z-index:3;top:90%;left:50%;transform:translate(-50%, -50%);">
+        <button id="enterBtn" style="padding:12px 40px;font-size:18px;background:linear-gradient(135deg, #8B4513, #A0522D, #CD853F);color:#F5DEB3;border:2px solid #654321;border-radius:6px;cursor:pointer;box-shadow:0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2), 0 0 20px rgba(255,215,0,0.3);transition:all 0.3s ease;font-weight:bold;font-family:'Dancing Script', cursive;text-shadow:1px 1px 2px rgba(0,0,0,0.7);position:absolute;overflow:hidden;min-height:45px;animation:pulse 2s ease-in-out infinite;opacity:0;z-index:3;top:85%;left:50%;transform:translate(-50%, -50%);">
             <span style="position:relative;z-index:2;display:block;line-height:1.2;">点击进入</span>
             <div style="position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);animation:shineLoop 3s ease-in-out infinite;"></div>
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139,69,19,0.1) 2px, rgba(139,69,19,0.1) 4px);opacity:0.4;pointer-events:none;"></div>
@@ -1118,7 +1176,7 @@
 
         <!-- Footer Section -->
         <footer class="footer">
-            <p>探索千年非遗文化的魅力  感受光影交织的传统艺术</p>
+            <p>探索千年非遗文化的魅力&nbsp;&nbsp;&nbsp;&nbsp;感受光影交织的传统艺术</p>
         </footer>
     </div>
 
@@ -1184,6 +1242,21 @@
     </div>
 
     <script>
+        // 立即显示loading.gif，不等待页面完全加载
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingContainer = document.getElementById('loadingContainer');
+            if (loadingContainer) {
+                loadingContainer.style.opacity = '1';
+                console.log('DOM加载完成，立即显示loading.gif');
+            }
+            
+            // 移动端背景优化
+            if (window.innerWidth <= 768) {
+                document.body.style.backgroundAttachment = 'fixed';
+                console.log('移动端：背景设置为fixed模式');
+            }
+        });
+        
         // 动态设置分享图片的绝对路径
         function setShareImageUrl() {
             const currentUrl = window.location.origin;
@@ -1238,48 +1311,32 @@
         window.addEventListener('load', function() {
             console.log('页面加载完成，开始动画序列');
             
-            // 第一步：显示loading.gif并监听播放完成
-            setTimeout(function() {
-                if (loadingContainer) {
-                    loadingContainer.style.opacity = '1';
-                    console.log('显示loading.gif');
+            // 第一步：确保loading.gif显示（已经设置为opacity:1，立即显示）
+            if (loadingContainer) {
+                console.log('loading.gif已显示');
+                
+                // 获取loading.gif图片元素
+                const loadingImg = loadingContainer.querySelector('img');
+                if (loadingImg) {
+                    // 监听GIF加载完成
+                    loadingImg.addEventListener('load', function() {
+                        console.log('loading.gif加载完成');
+                    });
                     
-                    // 获取loading.gif图片元素
-                    const loadingImg = loadingContainer.querySelector('img');
-                    if (loadingImg) {
-                        let gifPlayed = false;
-                        
-                        // 监听GIF播放完成
-                        loadingImg.addEventListener('loadstart', function() {
-                            console.log('loading.gif开始播放');
-                        });
-                        
-                        loadingImg.addEventListener('loadend', function() {
-                            if (!gifPlayed) {
-                                gifPlayed = true;
-                                console.log('loading.gif播放完成，停止播放');
-                                // 停止GIF播放（通过重新设置src来停止）
-                                loadingImg.style.animationPlayState = 'paused';
-                                // 或者可以隐藏loading.gif
-                                // loadingContainer.style.opacity = '0';
-                            }
-                        });
-                        
-                        // 如果GIF加载失败，也继续后续动画
-                        loadingImg.addEventListener('error', function() {
-                            console.log('loading.gif加载失败');
-                        });
-                    }
+                    // 如果GIF加载失败，也继续后续动画
+                    loadingImg.addEventListener('error', function() {
+                        console.log('loading.gif加载失败，继续显示');
+                    });
                 }
-            }, 500);
+            }
             
-            // 第二步：按钮淡入显示（延迟更长时间，让loading.gif多播放一会）
+            // 第二步：按钮淡入显示（减少延迟，让用户更快看到按钮）
             setTimeout(function() {
                 if (enterBtn) {
                     enterBtn.style.opacity = '1';
                     console.log('按钮淡入显示');
                 }
-            }, 3500);
+            }, 2000); // 从3500ms减少到2000ms
         });
         
         // Background Music Control - 简化版本
@@ -1575,6 +1632,7 @@
                     videoPlayer.src = embedUrl;
                     videoModal.classList.add('active');
                     document.body.style.overflow = 'hidden'; // 禁止背景滚动
+                    document.body.classList.add('modal-open'); // 添加弹窗状态类
                 } else if (videoSrc) {
                     // 如果有本地视频源，在弹窗中播放
                     videoPlayer.style.display = 'none';
@@ -1587,6 +1645,7 @@
                     });
                     videoModal.classList.add('active');
                     document.body.style.overflow = 'hidden'; // 禁止背景滚动
+                    document.body.classList.add('modal-open'); // 添加弹窗状态类
                 } else {
                     // 否则显示提示
                     alert(`即将播放: ${title}`);
@@ -1609,6 +1668,16 @@
             localVideoPlayer.pause(); // 暂停本地视频
             localVideoPlayer.currentTime = 0; // 重置本地视频时间
             document.body.style.overflow = 'auto'; // 恢复背景滚动
+            document.body.classList.remove('modal-open'); // 移除弹窗状态类
+            
+            // 移动端背景重新优化
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    document.body.style.backgroundAttachment = 'fixed';
+                    document.body.style.webkitTransform = 'translate3d(0, 0, 0)';
+                    document.body.style.transform = 'translate3d(0, 0, 0)';
+                }, 100);
+            }
         }
 
         // 关闭按钮点击事件
@@ -1637,6 +1706,7 @@
         function showCopyrightPanel() {
             copyrightPanel.classList.add('active');
             document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open'); // 添加弹窗状态类
             infoBtn.querySelector('span').textContent = '×';
             infoBtn.setAttribute('aria-label', '关闭');
         }
@@ -1644,8 +1714,18 @@
         function hideCopyrightPanel() {
             copyrightPanel.classList.remove('active');
             document.body.style.overflow = 'auto';
+            document.body.classList.remove('modal-open'); // 移除弹窗状态类
             infoBtn.querySelector('span').textContent = 'i';
             infoBtn.setAttribute('aria-label', '信息');
+            
+            // 移动端背景重新优化
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    document.body.style.backgroundAttachment = 'fixed';
+                    document.body.style.webkitTransform = 'translate3d(0, 0, 0)';
+                    document.body.style.transform = 'translate3d(0, 0, 0)';
+                }, 100);
+            }
         }
         
         infoBtn.addEventListener('click', () => {
