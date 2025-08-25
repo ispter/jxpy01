@@ -719,6 +719,8 @@
                 box-shadow: 0 0 20px rgba(255,215,0,0.6);
             }
         }
+        
+
 
         @media (max-width: 768px) {
             .video-modal-content {
@@ -730,6 +732,8 @@
                 top: -50px;
                 right: 10px;
             }
+            
+
         }
     </style>
 </head>
@@ -741,18 +745,18 @@
             <img src="images/loading.gif" alt="加载动画" style="width:auto;height:100%;object-fit:contain;filter:drop-shadow(2px 2px 4px rgba(0,0,0,0.7));">
         </div>
         
-        <!-- Title and Description -->
-        <div id="titleContainer" style="text-align:center;color:white;margin-bottom:40px;opacity:0;transition:opacity 1s ease;position:relative;z-index:2;">
-        </div>
+
         
         <!-- Enter Button -->
-        <button id="enterBtn" style="padding:12px 40px;font-size:18px;background:linear-gradient(135deg, #8B4513, #A0522D, #CD853F);color:#F5DEB3;border:2px solid #654321;border-radius:6px;cursor:pointer;box-shadow:0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2), 0 0 20px rgba(255,215,0,0.3);transition:all 0.3s ease;font-weight:bold;font-family:'Dancing Script', cursive;text-shadow:1px 1px 2px rgba(0,0,0,0.7);position:relative;overflow:hidden;min-height:45px;animation:pulse 2s ease-in-out infinite;opacity:0;transform:translateY(80vh);z-index:2;">
+        <button id="enterBtn" style="padding:12px 40px;font-size:18px;background:linear-gradient(135deg, #8B4513, #A0522D, #CD853F);color:#F5DEB3;border:2px solid #654321;border-radius:6px;cursor:pointer;box-shadow:0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2), 0 0 20px rgba(255,215,0,0.3);transition:all 0.3s ease;font-weight:bold;font-family:'Dancing Script', cursive;text-shadow:1px 1px 2px rgba(0,0,0,0.7);position:absolute;overflow:hidden;min-height:45px;animation:pulse 2s ease-in-out infinite;opacity:0;z-index:3;top:90%;left:50%;transform:translate(-50%, -50%);">
             <span style="position:relative;z-index:2;display:block;line-height:1.2;">点击进入</span>
             <div style="position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);animation:shineLoop 3s ease-in-out infinite;"></div>
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(139,69,19,0.1) 2px, rgba(139,69,19,0.1) 4px);opacity:0.4;pointer-events:none;"></div>
             <div style="position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);animation:rotate 4s linear infinite;pointer-events:none;"></div>
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;border:2px solid transparent;border-radius:6px;background:linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent) border-box;animation:borderGlow 2s ease-in-out infinite alternate;pointer-events:none;"></div>
         </button>
+        
+
         <div style="display:none"><audio id="bgMusic" src="mp3/bg.mp3" preload="auto"></audio></div>
     </div>
 
@@ -1207,7 +1211,6 @@
         
         // Welcome Page Animation Control
         const loadingContainer = document.getElementById('loadingContainer');
-        const titleContainer = document.getElementById('titleContainer');
         const enterBtn = document.getElementById('enterBtn');
         const welcomeOverlay = document.getElementById('welcomeOverlay');
         const loadingOverlay = document.getElementById('loadingOverlay');
@@ -1270,22 +1273,13 @@
                 }
             }, 500);
             
-            // 第二步：显示标题和描述
-            setTimeout(function() {
-                if (titleContainer) {
-                    titleContainer.style.opacity = '1';
-                    console.log('显示标题和描述');
-                }
-            }, 1500);
-            
-            // 第三步：按钮淡入到80%位置
+            // 第二步：按钮淡入显示（延迟更长时间，让loading.gif多播放一会）
             setTimeout(function() {
                 if (enterBtn) {
                     enterBtn.style.opacity = '1';
-                    enterBtn.style.transform = 'translateY(80vh)';
-                    console.log('按钮淡入到80%位置');
+                    console.log('按钮淡入显示');
                 }
-            }, 2500);
+            }, 3500);
         });
         
         // Background Music Control - 简化版本
@@ -1419,14 +1413,14 @@
             
             // 添加按钮悬停效果
             enterBtn.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.03) translateY(80vh)';
+                this.style.transform = 'translate(-50%, -50%) scale(1.03)';
                 this.style.boxShadow = '0 6px 16px rgba(139,69,19,0.7), inset 0 1px 3px rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.3)';
                 this.style.background = 'linear-gradient(135deg, #A0522D, #CD853F, #DEB887)';
                 this.style.color = '#FFF8DC';
             });
             
             enterBtn.addEventListener('mouseleave', function() {
-                this.style.transform = 'scale(1) translateY(80vh)';
+                this.style.transform = 'translate(-50%, -50%) scale(1)';
                 this.style.boxShadow = '0 4px 12px rgba(139,69,19,0.5), inset 0 1px 3px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.2)';
                 this.style.background = 'linear-gradient(135deg, #8B4513, #A0522D, #CD853F)';
                 this.style.color = '#F5DEB3';
