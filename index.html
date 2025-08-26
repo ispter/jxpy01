@@ -94,6 +94,7 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            overflow-y: auto;
             /* 固定背景设置 - 固定在浏览器视窗 */
             background-image: url('images/bg.jpg');
             background-size: cover;
@@ -105,6 +106,16 @@
             backface-visibility: hidden;
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
+            /* 背景图过渡效果 */
+            transition: background-image 0.3s ease;
+            /* 确保背景图始终显示 */
+            background-color: transparent;
+        }
+        
+        /* 强制阻止所有滚动 - 只在welcome-active状态下生效 */
+        body.welcome-active {
+            height: 100%;
+            overflow: hidden;
         }
         
         /* 微信浏览器特殊处理 */
@@ -134,12 +145,67 @@
                 -webkit-will-change: auto;
             }
             
-            /* 当弹窗打开时保持背景清晰 */
-            body.modal-open {
-                background-attachment: fixed !important;
-                -webkit-transform: translate3d(0, 0, 0) !important;
-                transform: translate3d(0, 0, 0) !important;
-            }
+                    /* 当弹窗打开时保持背景清晰 */
+        body.modal-open {
+            background-attachment: fixed !important;
+            -webkit-transform: translate3d(0, 0, 0) !important;
+            transform: translate3d(0, 0, 0) !important;
+        }
+        
+        /* Welcome overlay 滚动控制 */
+        body.welcome-active {
+            overflow: hidden !important;
+            position: fixed !important;
+            width: 100% !important;
+            height: 100% !important;
+            top: 0 !important;
+            left: 0 !important;
+            /* 保持背景图显示，避免白色过渡 */
+            background-image: url('images/bg.jpg') !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
+            /* 彻底阻止滚动 */
+            touch-action: none !important;
+            -webkit-overflow-scrolling: none !important;
+            overscroll-behavior: none !important;
+            /* 强制固定 */
+            transform: none !important;
+            -webkit-transform: none !important;
+        }
+        
+        body.welcome-active .welcome-overlay {
+            overflow: hidden;
+            touch-action: none !important;
+        }
+        
+        /* 确保welcome overlay显示时body背景图被隐藏 */
+        body.welcome-active {
+            background-image: none !important;
+            background: none !important;
+        }
+        
+        /* 额外确保所有元素在welcome-active状态下不滚动 */
+        body.welcome-active * {
+            overflow: hidden !important;
+            touch-action: none !important;
+        }
+        
+        /* 强制welcome overlay覆盖整个页面 */
+        #welcomeOverlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            height: calc(var(--vh, 1vh) * 100) !important;
+            z-index: 99999 !important;
+            overflow: hidden !important;
+            touch-action: none !important;
+            -webkit-overflow-scrolling: none !important;
+            overscroll-behavior: none !important;
+        }
         }
         
 
@@ -150,6 +216,16 @@
             padding: 0 16px 80px;
             min-height: 100vh;
             position: relative;
+            /* 初始状态隐藏，等待111.gif播放完成后显示 */
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 1s ease;
+        }
+        
+        /* 主内容区域显示状态 */
+        .container.content-visible {
+            visibility: visible;
+            opacity: 1;
         }
 
         /* Top Line Animation */
@@ -432,7 +508,7 @@
             backdrop-filter: blur(15px);
             box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
             transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 99;
+            z-index: 1002;
             overflow-y: auto;
         }
 
@@ -634,6 +710,11 @@
             backface-visibility: hidden;
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
+            /* 阻止滚动 */
+            overflow: hidden;
+            pointer-events: none;
+            /* 确保淡出时不会遮挡主内容 */
+            mix-blend-mode: normal;
         }
 
         .loading-overlay.fade-out {
@@ -648,6 +729,11 @@
                 -webkit-transform: translate3d(0, 0, 0);
                 transform: translate3d(0, 0, 0);
             }
+            
+            .loading-overlay img {
+                height: 100vh !important;
+                height: calc(var(--vh, 1vh) * 100) !important;
+            }
         }
 
         .loading-animation {
@@ -659,7 +745,8 @@
         /* GIF动画优先上下对齐 */
         .loading-overlay img {
             width: auto !important;
-            height: 100% !important;
+            height: 100vh !important;
+            height: calc(var(--vh, 1vh) * 100) !important;
             object-fit: contain !important;
             object-position: center;
             display: block;
@@ -797,9 +884,9 @@
 </head>
 <body>
     <!-- Welcome Overlay -->
-    <div id="welcomeOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);background:url('images/bg.jpg') center center;background-size:cover;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
+    <div id="welcomeOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);background:url('images/bg.jpg') center center;background-size:cover;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;touch-action:none;-webkit-overflow-scrolling:none;overscroll-behavior:none;">
         <!-- Loading GIF Container -->
-        <div id="loadingContainer" style="position:absolute;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity 1s ease;z-index:1;">
+        <div id="loadingContainer" style="position:absolute;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity 1s ease;z-index:1;pointer-events:none;">
             <img src="images/loading.gif" alt="加载动画" style="width:auto;height:100%;object-fit:contain;filter:drop-shadow(2px 2px 4px rgba(0,0,0,0.7));">
         </div>
         
@@ -819,7 +906,7 @@
     </div>
 
     <!-- Loading Animation Overlay (Hidden initially) -->
-    <div id="loadingOverlay" class="loading-overlay" style="display:none;opacity:1;height:100vh;height:calc(var(--vh, 1vh) * 100);">
+    <div id="loadingOverlay" class="loading-overlay" style="display:none;opacity:1;height:100vh;height:calc(var(--vh, 1vh) * 100);touch-action:none;-webkit-overflow-scrolling:none;overscroll-behavior:none;">
         <img src="images/111.gif" alt="加载动画" id="loadingGif" style="width:auto;height:100%;object-fit:contain;" />
     </div>
 
@@ -1191,6 +1278,7 @@
     <div class="copyright-panel" id="copyrightPanel">
         <div class="copyright-header">
             <h3 class="copyright-title">版权信息</h3>
+            <button class="close-copyright" id="closeCopyright">&times;</button>
         </div>
         <div class="copyright-content">
             <div class="copyright-section">
@@ -1250,11 +1338,70 @@
                 console.log('DOM加载完成，立即显示loading.gif');
             }
             
+            // 强制阻止所有滚动 - 定义为全局函数以便后续移除
+            window.forcePreventScroll = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
+            };
+            
+            // 键盘阻止函数
+            window.preventKeyScroll = function(e) {
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'PageDown' || e.key === 'PageUp' || e.key === ' ' || e.key === 'Home' || e.key === 'End') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    return false;
+                }
+            };
+            
+            // 右键菜单阻止函数
+            window.preventContextMenu = function(e) {
+                e.preventDefault();
+                return false;
+            };
+            
+            // 添加welcome-active类，阻止滚动
+            document.body.classList.add('welcome-active');
+            
+            // 强制设置body样式
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            document.body.style.height = '100%';
+            document.body.style.top = '0';
+            document.body.style.left = '0';
+            // 保持背景图显示
+            document.body.style.backgroundImage = 'url("images/bg.jpg")';
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center center';
+            document.body.style.backgroundRepeat = 'no-repeat';
+            document.body.style.backgroundAttachment = 'fixed';
+            
+            // 强制设置html样式
+            document.documentElement.style.overflow = 'hidden';
+            document.documentElement.style.height = '100%';
+            
+            // 添加滚动阻止事件监听器（最强力的覆盖）
+            document.addEventListener('wheel', window.forcePreventScroll, { passive: false, capture: true });
+            document.addEventListener('touchmove', window.forcePreventScroll, { passive: false, capture: true });
+            document.addEventListener('scroll', window.forcePreventScroll, { passive: false, capture: true });
+            document.addEventListener('keydown', window.preventKeyScroll, { passive: false, capture: true });
+            document.addEventListener('contextmenu', window.preventContextMenu);
+            
+            // 阻止所有可能的滚动事件
+            window.addEventListener('scroll', window.forcePreventScroll, { passive: false, capture: true });
+            window.addEventListener('wheel', window.forcePreventScroll, { passive: false, capture: true });
+            window.addEventListener('touchmove', window.forcePreventScroll, { passive: false, capture: true });
+            
             // 移动端背景优化
             if (window.innerWidth <= 768) {
                 document.body.style.backgroundAttachment = 'fixed';
                 console.log('移动端：背景设置为fixed模式');
             }
+            
+            console.log('强力滚动阻止已启用');
         });
         
         // 动态设置分享图片的绝对路径
@@ -1294,16 +1441,65 @@
         
         // 确保gif播放完成后再隐藏loading动画
         function hideLoadingAnimation() {
-            console.log('隐藏loading动画');
+            console.log('111.gif播放完成，开始淡出动画');
             // 停止音乐重试
             if (window.playInterval) {
                 clearInterval(window.playInterval);
             }
+            
+            // 确保主内容区域可见（在淡出开始前）
+            const container = document.querySelector('.container');
+            if (container) {
+                container.classList.add('content-visible');
+                console.log('主内容区域已显示，准备淡出111.gif');
+            }
+            
             // 添加淡出动画
             loadingOverlay.style.transition = 'opacity 1s ease';
             loadingOverlay.style.opacity = '0';
             setTimeout(function() {
                 loadingOverlay.style.display = 'none';
+                
+                // 111.gif播放完成后，移除滚动阻止，恢复正常滚动
+                document.body.classList.remove('welcome-active');
+                
+                // 恢复body样式
+                document.body.style.overflow = 'auto';
+                document.body.style.position = '';
+                document.body.style.width = '';
+                document.body.style.height = '';
+                document.body.style.top = '';
+                document.body.style.left = '';
+                
+                // 恢复html样式
+                document.documentElement.style.overflow = 'auto';
+                document.documentElement.style.height = '';
+                
+                // 移除所有滚动阻止事件监听器
+                document.removeEventListener('wheel', window.forcePreventScroll, { capture: true });
+                document.removeEventListener('touchmove', window.forcePreventScroll, { capture: true });
+                document.removeEventListener('scroll', window.forcePreventScroll, { capture: true });
+                document.removeEventListener('keydown', window.preventKeyScroll, { capture: true });
+                document.removeEventListener('contextmenu', window.preventContextMenu);
+                
+                window.removeEventListener('scroll', window.forcePreventScroll, { capture: true });
+                window.removeEventListener('wheel', window.forcePreventScroll, { capture: true });
+                window.removeEventListener('touchmove', window.forcePreventScroll, { capture: true });
+                
+                console.log('111.gif淡出完成，显示所有视频内容，恢复正常滚动');
+                console.log('滚动事件监听器已移除，页面可以正常滚动');
+                console.log('body overflow:', document.body.style.overflow);
+                console.log('html overflow:', document.documentElement.style.overflow);
+                
+                // 强制触发一次重排，确保样式生效
+                document.body.offsetHeight;
+                
+                // 再次确认滚动已恢复
+                setTimeout(function() {
+                    console.log('最终确认 - body overflow:', document.body.style.overflow);
+                    console.log('最终确认 - html overflow:', document.documentElement.style.overflow);
+                    console.log('最终确认 - welcome-active类:', document.body.classList.contains('welcome-active'));
+                }, 100);
             }, 1000);
         }
         
@@ -1440,23 +1636,28 @@
         
         if (enterBtn) {
             enterBtn.addEventListener('click', function() {
-                console.log('用户点击进入按钮');
+                console.log('用户点击进入按钮，开始播放111.gif');
                 
-                // 隐藏欢迎界面
+                // 保持滚动阻止，直到111.gif播放完成
+                // 不移除welcome-active类和滚动阻止事件监听器
+                
+                // 隐藏欢迎界面（loading.gif）
                 welcomeOverlay.style.display = 'none';
                 
-                // 显示加载动画并播放111.gif
+                // 显示111.gif加载动画
                 if (loadingOverlay) {
                     loadingOverlay.style.display = 'flex';
                     loadingOverlay.style.opacity = '1';
+                    console.log('显示111.gif加载动画');
                 }
                 
                 // 开始播放音乐和动画
                 startMusicAndAnimation();
                 
-                // 确保显示111.gif（在设置监听器之后）
+                // 确保显示111.gif
                 if (loadingGif) {
                     loadingGif.src = 'images/111.gif';
+                    console.log('设置111.gif源文件');
                 }
                 
                 // 微信浏览器特殊处理：用户点击后取消静音
@@ -1527,30 +1728,30 @@
             function setupGifListeners() {
                 // gif加载完成
                 loadingGif.addEventListener('load', function onLoad() {
-                    console.log('111.gif加载完成');
+                    console.log('111.gif加载完成，开始播放');
                     loadingGif.removeEventListener('load', onLoad);
                 });
                 
                 // gif开始播放
                 loadingGif.addEventListener('loadstart', function onLoadStart() {
-                    console.log('111.gif开始播放');
+                    console.log('111.gif开始加载');
                     loadingGif.removeEventListener('loadstart', onLoadStart);
                 });
                 
                 // gif播放结束
                 loadingGif.addEventListener('loadend', function onLoadEnd() {
                     console.log('111.gif播放结束');
-                    // 延迟2秒后淡出，确保GIF完全播放完成
+                    // 延迟3秒后淡出，确保GIF完全播放完成
                     setTimeout(function() {
-                        console.log('延迟2秒后开始淡出');
+                        console.log('延迟3秒后开始淡出111.gif');
                         hideLoadingAnimation();
-                    }, 2000);
+                    }, 3000);
                     loadingGif.removeEventListener('loadend', onLoadEnd);
                 });
                 
                 // 如果gif加载失败
                 loadingGif.addEventListener('error', function onError() {
-                    console.log('111.gif加载失败');
+                    console.log('111.gif加载失败，立即淡出');
                     // 立即隐藏loading动画
                     hideLoadingAnimation();
                     loadingGif.removeEventListener('error', onError);
@@ -1575,9 +1776,9 @@
             
             // 设置一个备用超时，防止事件没有触发
             setTimeout(function() {
-                console.log('备用超时：111.gif播放10秒后强制淡出');
+                console.log('备用超时：111.gif播放12秒后强制淡出');
                 hideLoadingAnimation();
-            }, 10000); // 10秒后强制淡出
+            }, 12000); // 12秒后强制淡出
         }
         
         // Scroll to top functionality
@@ -1702,6 +1903,7 @@
         // Copyright Panel Functionality
         const infoBtn = document.getElementById('infoBtn');
         const copyrightPanel = document.getElementById('copyrightPanel');
+        const closeCopyright = document.getElementById('closeCopyright');
         
         function showCopyrightPanel() {
             copyrightPanel.classList.add('active');
@@ -1735,6 +1937,9 @@
                 showCopyrightPanel();
             }
         });
+        
+        // 关闭按钮点击事件
+        closeCopyright.addEventListener('click', hideCopyrightPanel);
         
         // 点击面板外部关闭
         copyrightPanel.addEventListener('click', (e) => {
