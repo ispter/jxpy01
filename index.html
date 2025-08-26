@@ -122,9 +122,12 @@
         @supports (-webkit-touch-callout: none) {
             body {
                 min-height: -webkit-fill-available;
-                /* 微信浏览器背景图优化 */
-                background-attachment: scroll !important;
-                -webkit-background-attachment: scroll !important;
+                /* 保持背景图为bg.jpg */
+                background-image: url('images/bg.jpg') !important;
+                background-size: cover !important;
+                background-position: center center !important;
+                background-repeat: no-repeat !important;
+                background-attachment: fixed !important;
                 /* 防止微信浏览器模糊背景图 */
                 -webkit-transform: translate3d(0, 0, 0) !important;
                 transform: translate3d(0, 0, 0) !important;
@@ -137,36 +140,36 @@
         /* 微信浏览器专用优化 */
         @media screen and (-webkit-min-device-pixel-ratio: 0) {
             body {
-                /* 微信浏览器背景图防模糊 */
-                background-attachment: scroll !important;
-                -webkit-background-attachment: scroll !important;
+                /* 保持背景图为bg.jpg */
+                background-image: url('images/bg.jpg') !important;
+                background-size: cover !important;
+                background-position: center center !important;
+                background-repeat: no-repeat !important;
+                background-attachment: fixed !important;
                 /* 强制硬件加速 */
                 -webkit-transform: translate3d(0, 0, 0) !important;
                 transform: translate3d(0, 0, 0) !important;
                 /* 图片渲染优化 */
                 image-rendering: -webkit-optimize-contrast !important;
                 -webkit-image-rendering: -webkit-optimize-contrast !important;
-                /* 防止背景图被压缩 */
-                background-size: cover !important;
-                -webkit-background-size: cover !important;
             }
         }
         
         /* 微信浏览器移动端特殊优化 */
         @media screen and (max-width: 768px) and (-webkit-min-device-pixel-ratio: 0) {
             body {
-                /* 微信浏览器移动端背景图优化 */
-                background-attachment: scroll !important;
-                -webkit-background-attachment: scroll !important;
+                /* 保持背景图为bg.jpg */
+                background-image: url('images/bg.jpg') !important;
+                background-size: cover !important;
+                background-position: center center !important;
+                background-repeat: no-repeat !important;
+                background-attachment: fixed !important;
                 /* 防止背景图模糊 */
                 -webkit-transform: translate3d(0, 0, 0) !important;
                 transform: translate3d(0, 0, 0) !important;
                 /* 图片渲染优化 */
                 image-rendering: -webkit-optimize-contrast !important;
                 -webkit-image-rendering: -webkit-optimize-contrast !important;
-                /* 背景图质量优化 */
-                background-size: cover !important;
-                -webkit-background-size: cover !important;
                 /* 防止背景图被压缩 */
                 -webkit-background-clip: border-box !important;
                 background-clip: border-box !important;
@@ -200,9 +203,12 @@
         /* 移动端背景优化 */
         @media (max-width: 768px) {
             body {
-                background-attachment: scroll;
-                background-size: cover;
-                background-position: center center;
+                /* 保持背景图为bg.jpg */
+                background-image: url('images/bg.jpg') !important;
+                background-size: cover !important;
+                background-position: center center !important;
+                background-repeat: no-repeat !important;
+                background-attachment: fixed !important;
                 /* 移动端硬件加速 */
                 -webkit-transform: translate3d(0, 0, 0);
                 transform: translate3d(0, 0, 0);
@@ -1448,9 +1454,7 @@
             if (window.innerWidth <= 768) {
                 console.log('检测到移动端，应用背景图优化');
                 
-                // 移动端背景图优化
-                document.body.style.backgroundAttachment = 'scroll';
-                document.body.style.webkitBackgroundAttachment = 'scroll';
+                // 背景图由CSS控制，不在这里修改
                 
                 // 强制硬件加速
                 document.body.style.webkitTransform = 'translate3d(0, 0, 0)';
@@ -1460,9 +1464,7 @@
                 document.body.style.imageRendering = '-webkit-optimize-contrast';
                 document.body.style.webkitImageRendering = '-webkit-optimize-contrast';
                 
-                // 防止背景图被压缩
-                document.body.style.backgroundSize = 'cover';
-                document.body.style.webkitBackgroundSize = 'cover';
+                // 背景图大小由CSS控制
                 
                 // 移动端特殊优化
                 document.body.style.webkitBackfaceVisibility = 'hidden';
@@ -1550,9 +1552,7 @@
             if (isWeChatBrowser()) {
                 console.log('检测到微信浏览器，应用特殊优化');
                 
-                // 微信浏览器背景图优化
-                document.body.style.backgroundAttachment = 'scroll';
-                document.body.style.webkitBackgroundAttachment = 'scroll';
+                // 背景图由CSS控制，不在这里修改
                 
                 // 强制硬件加速
                 document.body.style.webkitTransform = 'translate3d(0, 0, 0)';
@@ -1562,9 +1562,7 @@
                 document.body.style.imageRendering = '-webkit-optimize-contrast';
                 document.body.style.webkitImageRendering = '-webkit-optimize-contrast';
                 
-                // 防止背景图被压缩
-                document.body.style.backgroundSize = 'cover';
-                document.body.style.webkitBackgroundSize = 'cover';
+                // 背景图大小由CSS控制
                 
                 // 微信浏览器特殊优化
                 document.body.style.webkitBackfaceVisibility = 'hidden';
@@ -1661,11 +1659,7 @@
             window.addEventListener('wheel', window.forcePreventScroll, { passive: false, capture: true });
             window.addEventListener('touchmove', window.forcePreventScroll, { passive: false, capture: true });
             
-            // 移动端背景优化
-            if (window.innerWidth <= 768) {
-                document.body.style.backgroundAttachment = 'scroll';
-                console.log('移动端：背景设置为scroll模式');
-            }
+            // 背景图由CSS控制，不在这里修改
             
             // 微信浏览器优化
             optimizeForWeChat();
