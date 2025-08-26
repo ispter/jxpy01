@@ -152,6 +152,51 @@
             }
         }
         
+        /* 微信浏览器移动端特殊优化 */
+        @media screen and (max-width: 768px) and (-webkit-min-device-pixel-ratio: 0) {
+            body {
+                /* 微信浏览器移动端背景图优化 */
+                background-attachment: scroll !important;
+                -webkit-background-attachment: scroll !important;
+                /* 防止背景图模糊 */
+                -webkit-transform: translate3d(0, 0, 0) !important;
+                transform: translate3d(0, 0, 0) !important;
+                /* 图片渲染优化 */
+                image-rendering: -webkit-optimize-contrast !important;
+                -webkit-image-rendering: -webkit-optimize-contrast !important;
+                /* 背景图质量优化 */
+                background-size: cover !important;
+                -webkit-background-size: cover !important;
+                /* 防止背景图被压缩 */
+                -webkit-background-clip: border-box !important;
+                background-clip: border-box !important;
+                /* 微信浏览器特殊优化 */
+                -webkit-backface-visibility: hidden !important;
+                backface-visibility: hidden !important;
+                /* 防止背景图重新渲染 */
+                will-change: auto !important;
+                -webkit-will-change: auto !important;
+            }
+            
+            /* 微信浏览器中视频内容区域优化 */
+            .container {
+                /* 确保内容区域不影响背景图 */
+                background: transparent !important;
+                /* 防止内容区域影响背景图渲染 */
+                -webkit-transform: translate3d(0, 0, 0) !important;
+                transform: translate3d(0, 0, 0) !important;
+            }
+            
+            /* 微信浏览器中视频卡片优化 */
+            .video-card {
+                /* 确保视频卡片不影响背景图 */
+                background: transparent !important;
+                /* 防止视频卡片影响背景图渲染 */
+                -webkit-transform: translate3d(0, 0, 0) !important;
+                transform: translate3d(0, 0, 0) !important;
+            }
+        }
+        
         /* 移动端背景优化 */
         @media (max-width: 768px) {
             body {
@@ -1365,22 +1410,84 @@
             return ua.indexOf('micromessenger') !== -1;
         }
         
+        // 微信浏览器滚动优化
+        function optimizeWeChatScroll() {
+            if (isWeChatBrowser() && window.innerWidth <= 768) {
+                console.log('应用微信浏览器滚动优化');
+                
+                // 优化滚动性能
+                document.body.style.webkitOverflowScrolling = 'touch';
+                document.body.style.overflowScrolling = 'touch';
+                
+                // 防止滚动时的背景图问题
+                document.addEventListener('scroll', function() {
+                    // 强制重新渲染背景图
+                    document.body.style.webkitTransform = 'translate3d(0, 0, 0)';
+                    document.body.style.transform = 'translate3d(0, 0, 0)';
+                }, { passive: true });
+                
+                // 优化触摸滚动
+                document.addEventListener('touchmove', function() {
+                    // 确保背景图在触摸滚动时保持清晰
+                    document.body.style.webkitTransform = 'translate3d(0, 0, 0)';
+                    document.body.style.transform = 'translate3d(0, 0, 0)';
+                }, { passive: true });
+            }
+        }
+        
         // 微信浏览器背景图优化
         function optimizeForWeChat() {
             if (isWeChatBrowser()) {
                 console.log('检测到微信浏览器，应用特殊优化');
+                
                 // 微信浏览器背景图优化
                 document.body.style.backgroundAttachment = 'scroll';
                 document.body.style.webkitBackgroundAttachment = 'scroll';
+                
                 // 强制硬件加速
                 document.body.style.webkitTransform = 'translate3d(0, 0, 0)';
                 document.body.style.transform = 'translate3d(0, 0, 0)';
+                
                 // 图片渲染优化
                 document.body.style.imageRendering = '-webkit-optimize-contrast';
                 document.body.style.webkitImageRendering = '-webkit-optimize-contrast';
+                
                 // 防止背景图被压缩
                 document.body.style.backgroundSize = 'cover';
                 document.body.style.webkitBackgroundSize = 'cover';
+                
+                // 微信浏览器特殊优化
+                document.body.style.webkitBackfaceVisibility = 'hidden';
+                document.body.style.backfaceVisibility = 'hidden';
+                
+                // 防止背景图重新渲染
+                document.body.style.willChange = 'auto';
+                document.body.style.webkitWillChange = 'auto';
+                
+                // 移动端微信浏览器特殊处理
+                if (window.innerWidth <= 768) {
+                    console.log('检测到移动端微信浏览器，应用额外优化');
+                    
+                    // 移动端微信浏览器背景图优化
+                    document.body.style.webkitBackgroundClip = 'border-box';
+                    document.body.style.backgroundClip = 'border-box';
+                    
+                    // 确保内容区域不影响背景图
+                    const container = document.querySelector('.container');
+                    if (container) {
+                        container.style.background = 'transparent';
+                        container.style.webkitTransform = 'translate3d(0, 0, 0)';
+                        container.style.transform = 'translate3d(0, 0, 0)';
+                    }
+                    
+                    // 确保视频卡片不影响背景图
+                    const videoCards = document.querySelectorAll('.video-card');
+                    videoCards.forEach(card => {
+                        card.style.background = 'transparent';
+                        card.style.webkitTransform = 'translate3d(0, 0, 0)';
+                        card.style.transform = 'translate3d(0, 0, 0)';
+                    });
+                }
             }
         }
         
@@ -1452,6 +1559,9 @@
             
             // 微信浏览器优化
             optimizeForWeChat();
+            
+            // 微信浏览器滚动优化
+            optimizeWeChatScroll();
             
             console.log('强力滚动阻止已启用');
         });
@@ -1545,6 +1655,13 @@
                 
                 // 强制触发一次重排，确保样式生效
                 document.body.offsetHeight;
+                
+                // 微信浏览器优化（在内容显示后）
+                if (isWeChatBrowser()) {
+                    console.log('内容显示后，重新应用微信浏览器优化');
+                    optimizeForWeChat();
+                    optimizeWeChatScroll();
+                }
                 
                 // 再次确认滚动已恢复
                 setTimeout(function() {
