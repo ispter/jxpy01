@@ -122,13 +122,40 @@
         @supports (-webkit-touch-callout: none) {
             body {
                 min-height: -webkit-fill-available;
+                /* 微信浏览器背景图优化 */
+                background-attachment: scroll !important;
+                -webkit-background-attachment: scroll !important;
+                /* 防止微信浏览器模糊背景图 */
+                -webkit-transform: translate3d(0, 0, 0) !important;
+                transform: translate3d(0, 0, 0) !important;
+                /* 微信浏览器图片渲染优化 */
+                image-rendering: -webkit-optimize-contrast !important;
+                -webkit-image-rendering: -webkit-optimize-contrast !important;
+            }
+        }
+        
+        /* 微信浏览器专用优化 */
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            body {
+                /* 微信浏览器背景图防模糊 */
+                background-attachment: scroll !important;
+                -webkit-background-attachment: scroll !important;
+                /* 强制硬件加速 */
+                -webkit-transform: translate3d(0, 0, 0) !important;
+                transform: translate3d(0, 0, 0) !important;
+                /* 图片渲染优化 */
+                image-rendering: -webkit-optimize-contrast !important;
+                -webkit-image-rendering: -webkit-optimize-contrast !important;
+                /* 防止背景图被压缩 */
+                background-size: cover !important;
+                -webkit-background-size: cover !important;
             }
         }
         
         /* 移动端背景优化 */
         @media (max-width: 768px) {
             body {
-                background-attachment: fixed;
+                background-attachment: scroll;
                 background-size: cover;
                 background-position: center center;
                 /* 移动端硬件加速 */
@@ -137,8 +164,8 @@
                 -webkit-perspective: 1000;
                 perspective: 1000;
                 /* 图片渲染优化 - 保持清晰 */
-                image-rendering: auto;
-                -webkit-image-rendering: auto;
+                image-rendering: -webkit-optimize-contrast;
+                -webkit-image-rendering: -webkit-optimize-contrast;
                 /* 防止背景重新渲染 */
                 will-change: auto;
                 -webkit-will-change: auto;
@@ -221,6 +248,15 @@
         .container.content-visible {
             visibility: visible;
             opacity: 1;
+        }
+        
+        /* 确保背景图在所有状态下都保持一致 */
+        body, body.welcome-active, body:not(.welcome-active) {
+            background-image: url('images/bg.jpg') !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
         }
 
         /* Top Line Animation */
@@ -877,7 +913,7 @@
 </head>
 <body>
     <!-- Welcome Overlay -->
-    <div id="welcomeOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);background:url('images/bg.jpg') center center;background-size:cover;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;touch-action:none;-webkit-overflow-scrolling:none;overscroll-behavior:none;">
+    <div id="welcomeOverlay" style="position:fixed;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);background:transparent;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;touch-action:none;-webkit-overflow-scrolling:none;overscroll-behavior:none;">
         <!-- Loading GIF Container -->
         <div id="loadingContainer" style="position:absolute;top:0;left:0;width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity 1s ease;z-index:1;pointer-events:none;">
             <img src="images/loading.gif" alt="加载动画" style="width:auto;height:100%;object-fit:contain;filter:drop-shadow(2px 2px 4px rgba(0,0,0,0.7));">
@@ -1323,6 +1359,31 @@
     </div>
 
     <script>
+        // 微信浏览器检测和优化
+        function isWeChatBrowser() {
+            const ua = navigator.userAgent.toLowerCase();
+            return ua.indexOf('micromessenger') !== -1;
+        }
+        
+        // 微信浏览器背景图优化
+        function optimizeForWeChat() {
+            if (isWeChatBrowser()) {
+                console.log('检测到微信浏览器，应用特殊优化');
+                // 微信浏览器背景图优化
+                document.body.style.backgroundAttachment = 'scroll';
+                document.body.style.webkitBackgroundAttachment = 'scroll';
+                // 强制硬件加速
+                document.body.style.webkitTransform = 'translate3d(0, 0, 0)';
+                document.body.style.transform = 'translate3d(0, 0, 0)';
+                // 图片渲染优化
+                document.body.style.imageRendering = '-webkit-optimize-contrast';
+                document.body.style.webkitImageRendering = '-webkit-optimize-contrast';
+                // 防止背景图被压缩
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.webkitBackgroundSize = 'cover';
+            }
+        }
+        
         // 立即显示loading.gif，不等待页面完全加载
         document.addEventListener('DOMContentLoaded', function() {
             const loadingContainer = document.getElementById('loadingContainer');
@@ -1385,9 +1446,12 @@
             
             // 移动端背景优化
             if (window.innerWidth <= 768) {
-                document.body.style.backgroundAttachment = 'fixed';
-                console.log('移动端：背景设置为fixed模式');
+                document.body.style.backgroundAttachment = 'scroll';
+                console.log('移动端：背景设置为scroll模式');
             }
+            
+            // 微信浏览器优化
+            optimizeForWeChat();
             
             console.log('强力滚动阻止已启用');
         });
