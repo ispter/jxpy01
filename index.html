@@ -106,8 +106,8 @@
             backface-visibility: hidden;
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
-            /* 背景图过渡效果 */
-            transition: background-image 0.3s ease;
+            /* 背景图固定，无过渡效果 */
+            transition: none;
             /* 确保背景图始终显示 */
             background-color: transparent;
         }
@@ -180,10 +180,13 @@
             touch-action: none !important;
         }
         
-        /* 确保welcome overlay显示时body背景图被隐藏 */
+        /* 确保背景图始终显示，不隐藏 */
         body.welcome-active {
-            background-image: none !important;
-            background: none !important;
+            background-image: url('images/bg.jpg') !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
         }
         
         /* 额外确保所有元素在welcome-active状态下不滚动 */
@@ -1372,12 +1375,7 @@
             document.body.style.height = '100%';
             document.body.style.top = '0';
             document.body.style.left = '0';
-            // 保持背景图显示
-            document.body.style.backgroundImage = 'url("images/bg.jpg")';
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundPosition = 'center center';
-            document.body.style.backgroundRepeat = 'no-repeat';
-            document.body.style.backgroundAttachment = 'fixed';
+            // 背景图由CSS控制，不在这里修改
             
             // 强制设置html样式
             document.documentElement.style.overflow = 'hidden';
