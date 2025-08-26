@@ -841,11 +841,50 @@
                 background-attachment: scroll;
                 -webkit-transform: translate3d(0, 0, 0);
                 transform: translate3d(0, 0, 0);
+                /* 确保在移动端占满整个屏幕 */
+                height: 100vh !important;
+                height: calc(var(--vh, 1vh) * 100) !important;
+                min-height: 100vh !important;
+                min-height: calc(var(--vh, 1vh) * 100) !important;
             }
             
             .loading-overlay img {
                 height: 100vh !important;
                 height: calc(var(--vh, 1vh) * 100) !important;
+                min-height: 100vh !important;
+                min-height: calc(var(--vh, 1vh) * 100) !important;
+                /* 确保图片完全填充容器 */
+                object-fit: cover !important;
+                object-position: center !important;
+            }
+        }
+        
+        /* 微信浏览器特殊处理 */
+        @media screen and (max-width: 768px) and (-webkit-min-device-pixel-ratio: 0) {
+            .loading-overlay {
+                /* 微信浏览器中确保占满屏幕 */
+                height: 100vh !important;
+                height: calc(var(--vh, 1vh) * 100) !important;
+                min-height: 100vh !important;
+                min-height: calc(var(--vh, 1vh) * 100) !important;
+                /* 防止微信浏览器中的空隙 */
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+            }
+            
+            .loading-overlay img {
+                height: 100vh !important;
+                height: calc(var(--vh, 1vh) * 100) !important;
+                min-height: 100vh !important;
+                min-height: calc(var(--vh, 1vh) * 100) !important;
+                /* 确保图片完全填充容器 */
+                object-fit: cover !important;
+                object-position: center !important;
+                /* 防止微信浏览器中的空隙 */
+                margin: 0 !important;
+                padding: 0 !important;
             }
         }
 
@@ -1449,10 +1488,54 @@
             return ua.indexOf('micromessenger') !== -1;
         }
         
+        // 设置视口高度变量
+        function setViewportHeight() {
+            // 获取实际视口高度
+            const vh = window.innerHeight * 0.01;
+            // 设置CSS变量
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+            console.log('视口高度设置为:', vh + 'px');
+        }
+        
         // 移动端背景图优化
         function optimizeMobileBackground() {
             if (window.innerWidth <= 768) {
                 console.log('检测到移动端，应用背景图优化');
+                
+                // 设置视口高度
+                setViewportHeight();
+                
+                // 微信浏览器特殊处理
+                if (isWeChatBrowser()) {
+                    console.log('微信浏览器中，应用特殊视口处理');
+                    // 强制设置视口高度
+                    document.documentElement.style.height = '100%';
+                    document.body.style.height = '100%';
+                    // 确保loading overlay占满屏幕
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.style.height = '100vh';
+                        loadingOverlay.style.height = 'calc(var(--vh, 1vh) * 100)';
+                        loadingOverlay.style.minHeight = '100vh';
+                        loadingOverlay.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
+                        loadingOverlay.style.top = '0';
+                        loadingOverlay.style.left = '0';
+                        loadingOverlay.style.right = '0';
+                        loadingOverlay.style.bottom = '0';
+                    }
+                    // 确保loading overlay中的图片占满屏幕
+                    const loadingGif = document.getElementById('loadingGif');
+                    if (loadingGif) {
+                        loadingGif.style.height = '100vh';
+                        loadingGif.style.height = 'calc(var(--vh, 1vh) * 100)';
+                        loadingGif.style.minHeight = '100vh';
+                        loadingGif.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
+                        loadingGif.style.objectFit = 'cover';
+                        loadingGif.style.objectPosition = 'center';
+                        loadingGif.style.margin = '0';
+                        loadingGif.style.padding = '0';
+                    }
+                }
                 
                 // 背景图由CSS控制，不在这里修改
                 
@@ -1667,8 +1750,29 @@
             // 微信浏览器滚动优化
             optimizeWeChatScroll();
             
+            // 设置视口高度
+            setViewportHeight();
+            
             // 移动端背景图优化
             optimizeMobileBackground();
+            
+            // 监听窗口大小变化，重新设置视口高度
+            window.addEventListener('resize', function() {
+                setViewportHeight();
+                if (window.innerWidth <= 768) {
+                    optimizeMobileBackground();
+                }
+            });
+            
+            // 监听方向变化，重新设置视口高度
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    setViewportHeight();
+                    if (window.innerWidth <= 768) {
+                        optimizeMobileBackground();
+                    }
+                }, 100);
+            });
             
             console.log('强力滚动阻止已启用');
         });
@@ -1769,6 +1873,9 @@
                     optimizeForWeChat();
                     optimizeWeChatScroll();
                 }
+                
+                // 重新设置视口高度
+                setViewportHeight();
                 
                 // 移动端背景图优化（在内容显示后）
                 optimizeMobileBackground();
