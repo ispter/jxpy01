@@ -872,6 +872,16 @@
                 left: 0 !important;
                 right: 0 !important;
                 bottom: 0 !important;
+                /* 确保完全占满屏幕 */
+                position: fixed !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                height: calc(var(--vh, 1vh) * 100) !important;
+                /* 移除任何可能的边距 */
+                margin: 0 !important;
+                padding: 0 !important;
+                /* 确保层级正确 */
+                z-index: 9999 !important;
             }
             
             .loading-overlay img {
@@ -885,6 +895,12 @@
                 /* 防止微信浏览器中的空隙 */
                 margin: 0 !important;
                 padding: 0 !important;
+                /* 确保图片完全占满容器 */
+                width: 100% !important;
+                height: 100% !important;
+                /* 移除任何可能的边距 */
+                border: none !important;
+                outline: none !important;
             }
         }
 
@@ -899,8 +915,8 @@
             width: auto !important;
             height: 100vh !important;
             height: calc(var(--vh, 1vh) * 100) !important;
-            object-fit: contain !important;
-            object-position: center;
+            object-fit: cover !important;
+            object-position: center !important;
             display: block;
             margin: 0 auto;
         }
@@ -1497,6 +1513,44 @@
             console.log('视口高度设置为:', vh + 'px');
         }
         
+        // 确保111.gif完全占满屏幕
+        function ensureGifFullScreen() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingGif = document.getElementById('loadingGif');
+            
+            if (loadingOverlay && loadingGif) {
+                // 强制设置loading overlay占满屏幕
+                loadingOverlay.style.position = 'fixed';
+                loadingOverlay.style.top = '0';
+                loadingOverlay.style.left = '0';
+                loadingOverlay.style.right = '0';
+                loadingOverlay.style.bottom = '0';
+                loadingOverlay.style.width = '100vw';
+                loadingOverlay.style.height = '100vh';
+                loadingOverlay.style.height = 'calc(var(--vh, 1vh) * 100)';
+                loadingOverlay.style.minHeight = '100vh';
+                loadingOverlay.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
+                loadingOverlay.style.margin = '0';
+                loadingOverlay.style.padding = '0';
+                loadingOverlay.style.zIndex = '9999';
+                
+                // 强制设置图片占满容器
+                loadingGif.style.width = '100%';
+                loadingGif.style.height = '100%';
+                loadingGif.style.height = 'calc(var(--vh, 1vh) * 100)';
+                loadingGif.style.minHeight = '100vh';
+                loadingGif.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
+                loadingGif.style.objectFit = 'cover';
+                loadingGif.style.objectPosition = 'center';
+                loadingGif.style.margin = '0';
+                loadingGif.style.padding = '0';
+                loadingGif.style.border = 'none';
+                loadingGif.style.outline = 'none';
+                
+                console.log('111.gif已设置为完全占满屏幕');
+            }
+        }
+        
         // 移动端背景图优化
         function optimizeMobileBackground() {
             if (window.innerWidth <= 768) {
@@ -1511,30 +1565,8 @@
                     // 强制设置视口高度
                     document.documentElement.style.height = '100%';
                     document.body.style.height = '100%';
-                    // 确保loading overlay占满屏幕
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    if (loadingOverlay) {
-                        loadingOverlay.style.height = '100vh';
-                        loadingOverlay.style.height = 'calc(var(--vh, 1vh) * 100)';
-                        loadingOverlay.style.minHeight = '100vh';
-                        loadingOverlay.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
-                        loadingOverlay.style.top = '0';
-                        loadingOverlay.style.left = '0';
-                        loadingOverlay.style.right = '0';
-                        loadingOverlay.style.bottom = '0';
-                    }
-                    // 确保loading overlay中的图片占满屏幕
-                    const loadingGif = document.getElementById('loadingGif');
-                    if (loadingGif) {
-                        loadingGif.style.height = '100vh';
-                        loadingGif.style.height = 'calc(var(--vh, 1vh) * 100)';
-                        loadingGif.style.minHeight = '100vh';
-                        loadingGif.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
-                        loadingGif.style.objectFit = 'cover';
-                        loadingGif.style.objectPosition = 'center';
-                        loadingGif.style.margin = '0';
-                        loadingGif.style.padding = '0';
-                    }
+                    // 确保111.gif完全占满屏幕
+                    ensureGifFullScreen();
                 }
                 
                 // 背景图由CSS控制，不在这里修改
@@ -1761,6 +1793,9 @@
                 setViewportHeight();
                 if (window.innerWidth <= 768) {
                     optimizeMobileBackground();
+                    if (isWeChatBrowser()) {
+                        ensureGifFullScreen();
+                    }
                 }
             });
             
@@ -1770,6 +1805,9 @@
                     setViewportHeight();
                     if (window.innerWidth <= 768) {
                         optimizeMobileBackground();
+                        if (isWeChatBrowser()) {
+                            ensureGifFullScreen();
+                        }
                     }
                 }, 100);
             });
@@ -1879,6 +1917,11 @@
                 
                 // 移动端背景图优化（在内容显示后）
                 optimizeMobileBackground();
+                
+                // 确保111.gif完全占满屏幕
+                if (isWeChatBrowser()) {
+                    ensureGifFullScreen();
+                }
                 
                 // 再次确认滚动已恢复
                 setTimeout(function() {
