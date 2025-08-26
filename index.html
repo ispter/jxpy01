@@ -96,11 +96,11 @@
             overflow-x: hidden;
             overflow-y: auto;
             /* 固定背景设置 - 固定在浏览器视窗 */
-            background-image: url('images/bg.jpg');
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            background-image: url('images/bg.jpg') !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
             /* 移动端优化 */
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
@@ -136,10 +136,9 @@
                 transform: translate3d(0, 0, 0);
                 -webkit-perspective: 1000;
                 perspective: 1000;
-                /* 图片渲染优化 */
-                image-rendering: -webkit-optimize-contrast;
-                image-rendering: crisp-edges;
-                image-rendering: pixelated;
+                /* 图片渲染优化 - 保持清晰 */
+                image-rendering: auto;
+                -webkit-image-rendering: auto;
                 /* 防止背景重新渲染 */
                 will-change: auto;
                 -webkit-will-change: auto;
@@ -180,14 +179,7 @@
             touch-action: none !important;
         }
         
-        /* 确保背景图始终显示，不隐藏 */
-        body.welcome-active {
-            background-image: url('images/bg.jpg') !important;
-            background-size: cover !important;
-            background-position: center center !important;
-            background-repeat: no-repeat !important;
-            background-attachment: fixed !important;
-        }
+
         
         /* 额外确保所有元素在welcome-active状态下不滚动 */
         body.welcome-active * {
@@ -700,9 +692,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('images/bg.jpg') center center;
-            background-size: cover;
-            background-repeat: no-repeat;
+            background: transparent;
             z-index: 9999;
             display: flex;
             align-items: center;
