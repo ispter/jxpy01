@@ -605,6 +605,14 @@
             font-size: 18px;
             font-weight: bold;
         }
+        
+        /* 在welcome-active状态下隐藏固定定位的UI元素 */
+        body.welcome-active .info-icon,
+        body.welcome-active .scroll-top,
+        body.welcome-active .copyright-panel,
+        body.welcome-active .video-modal {
+            display: none !important;
+        }
 
         .info-icon:hover {
             background: rgba(255, 255, 255, 0.2);
@@ -811,11 +819,12 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
             background: transparent;
             z-index: 9999;
             display: flex;
-            align-items: center;
+            align-items: stretch;
             justify-content: center;
             transition: opacity 1s ease;
             /* 移动端优化 */
@@ -853,9 +862,10 @@
                 height: calc(var(--vh, 1vh) * 100) !important;
                 min-height: 100vh !important;
                 min-height: calc(var(--vh, 1vh) * 100) !important;
-                /* 确保图片完全填充容器 */
+                /* 确保图片完全填充容器，上下顶到浏览器边缘 */
                 object-fit: cover !important;
                 object-position: center !important;
+                width: 100% !important;
             }
         }
         
@@ -879,9 +889,10 @@
                 height: calc(var(--vh, 1vh) * 100) !important;
                 min-height: 100vh !important;
                 min-height: calc(var(--vh, 1vh) * 100) !important;
-                /* 确保图片完全填充容器 */
+                /* 确保图片完全填充容器，上下顶到浏览器边缘 */
                 object-fit: cover !important;
                 object-position: center !important;
+                width: 100% !important;
                 /* 防止微信浏览器中的空隙 */
                 margin: 0 !important;
                 padding: 0 !important;
@@ -896,16 +907,13 @@
         
         /* GIF动画优先上下对齐 */
         .loading-overlay img {
-            width: 100% !important;
+            width: auto !important;
             height: 100vh !important;
             height: calc(var(--vh, 1vh) * 100) !important;
-            min-height: 100vh !important;
-            min-height: calc(var(--vh, 1vh) * 100) !important;
             object-fit: cover !important;
-            object-position: center !important;
+            object-position: center;
             display: block;
-            margin: 0 !important;
-            padding: 0 !important;
+            margin: 0 auto;
         }
 
         /* Loading Animation */
@@ -1061,8 +1069,8 @@
     </div>
 
     <!-- Loading Animation Overlay (Hidden initially) -->
-    <div id="loadingOverlay" class="loading-overlay" style="display:none;opacity:1;height:100vh;height:calc(var(--vh, 1vh) * 100);min-height:100vh;min-height:calc(var(--vh, 1vh) * 100);touch-action:none;-webkit-overflow-scrolling:none;overscroll-behavior:none;">
-        <img src="images/111.gif" alt="加载动画" id="loadingGif" style="width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);min-height:100vh;min-height:calc(var(--vh, 1vh) * 100);object-fit:cover;object-position:center;margin:0;padding:0;" />
+    <div id="loadingOverlay" class="loading-overlay" style="display:none;opacity:1;height:100vh;height:calc(var(--vh, 1vh) * 100);touch-action:none;-webkit-overflow-scrolling:none;overscroll-behavior:none;">
+        <img src="images/111.gif" alt="加载动画" id="loadingGif" style="width:100%;height:100vh;height:calc(var(--vh, 1vh) * 100);object-fit:cover;object-position:center;" />
     </div>
 
     
@@ -1491,37 +1499,6 @@
             return ua.indexOf('micromessenger') !== -1;
         }
         
-        // 确保111.gif在微信浏览器中正确显示
-        function optimizeLoadingGif() {
-            const loadingGif = document.getElementById('loadingGif');
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            
-            if (loadingGif && loadingOverlay) {
-                // 确保loading overlay占满屏幕
-                loadingOverlay.style.height = '100vh';
-                loadingOverlay.style.height = 'calc(var(--vh, 1vh) * 100)';
-                loadingOverlay.style.minHeight = '100vh';
-                loadingOverlay.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
-                loadingOverlay.style.top = '0';
-                loadingOverlay.style.left = '0';
-                loadingOverlay.style.right = '0';
-                loadingOverlay.style.bottom = '0';
-                
-                // 确保111.gif完全填满屏幕
-                loadingGif.style.width = '100%';
-                loadingGif.style.height = '100vh';
-                loadingGif.style.height = 'calc(var(--vh, 1vh) * 100)';
-                loadingGif.style.minHeight = '100vh';
-                loadingGif.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
-                loadingGif.style.objectFit = 'cover';
-                loadingGif.style.objectPosition = 'center';
-                loadingGif.style.margin = '0';
-                loadingGif.style.padding = '0';
-                
-                console.log('111.gif样式已优化，确保填满屏幕');
-            }
-        }
-        
         // 设置视口高度变量
         function setViewportHeight() {
             // 获取实际视口高度
@@ -1569,7 +1546,6 @@
                         loadingGif.style.objectPosition = 'center';
                         loadingGif.style.margin = '0';
                         loadingGif.style.padding = '0';
-                        console.log('移动端微信浏览器中111.gif样式已优化');
                     }
                 }
                 
@@ -1714,33 +1690,6 @@
                         card.style.webkitTransform = 'translate3d(0, 0, 0)';
                         card.style.transform = 'translate3d(0, 0, 0)';
                     });
-                    
-                    // 微信浏览器中111.gif特殊优化
-                    const loadingGif = document.getElementById('loadingGif');
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    if (loadingGif && loadingOverlay) {
-                        // 确保loading overlay占满屏幕
-                        loadingOverlay.style.height = '100vh';
-                        loadingOverlay.style.height = 'calc(var(--vh, 1vh) * 100)';
-                        loadingOverlay.style.minHeight = '100vh';
-                        loadingOverlay.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
-                        loadingOverlay.style.top = '0';
-                        loadingOverlay.style.left = '0';
-                        loadingOverlay.style.right = '0';
-                        loadingOverlay.style.bottom = '0';
-                        
-                        // 确保111.gif完全填满屏幕
-                        loadingGif.style.width = '100%';
-                        loadingGif.style.height = '100vh';
-                        loadingGif.style.height = 'calc(var(--vh, 1vh) * 100)';
-                        loadingGif.style.minHeight = '100vh';
-                        loadingGif.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
-                        loadingGif.style.objectFit = 'cover';
-                        loadingGif.style.objectPosition = 'center';
-                        loadingGif.style.margin = '0';
-                        loadingGif.style.padding = '0';
-                        console.log('微信浏览器中111.gif样式已优化');
-                    }
                 }
             }
         }
@@ -1819,16 +1768,12 @@
             // 移动端背景图优化
             optimizeMobileBackground();
             
-            // 优化111.gif显示
-            optimizeLoadingGif();
-            
             // 监听窗口大小变化，重新设置视口高度
             window.addEventListener('resize', function() {
                 setViewportHeight();
                 if (window.innerWidth <= 768) {
                     optimizeMobileBackground();
                 }
-                optimizeLoadingGif();
             });
             
             // 监听方向变化，重新设置视口高度
@@ -1838,7 +1783,6 @@
                     if (window.innerWidth <= 768) {
                         optimizeMobileBackground();
                     }
-                    optimizeLoadingGif();
                 }, 100);
             });
             
@@ -1927,6 +1871,13 @@
                 window.removeEventListener('wheel', window.forcePreventScroll, { capture: true });
                 window.removeEventListener('touchmove', window.forcePreventScroll, { capture: true });
                 
+                // 重新显示info按钮
+                const infoBtn = document.getElementById('infoBtn');
+                if (infoBtn) {
+                    infoBtn.style.display = 'flex';
+                    console.log('重新显示info按钮');
+                }
+                
                 console.log('111.gif淡出完成，显示所有视频内容，恢复正常滚动');
                 console.log('滚动事件监听器已移除，页面可以正常滚动');
                 console.log('body overflow:', document.body.style.overflow);
@@ -1947,9 +1898,6 @@
                 
                 // 移动端背景图优化（在内容显示后）
                 optimizeMobileBackground();
-                
-                // 确保111.gif优化
-                optimizeLoadingGif();
                 
                 // 再次确认滚动已恢复
                 setTimeout(function() {
@@ -2108,23 +2056,20 @@
                     console.log('显示111.gif加载动画');
                 }
                 
+                // 隐藏info按钮，避免在111.gif播放时显示
+                const infoBtn = document.getElementById('infoBtn');
+                if (infoBtn) {
+                    infoBtn.style.display = 'none';
+                    console.log('隐藏info按钮');
+                }
+                
                 // 开始播放音乐和动画
                 startMusicAndAnimation();
                 
                 // 确保显示111.gif
                 if (loadingGif) {
                     loadingGif.src = 'images/111.gif';
-                    // 确保在微信浏览器中正确显示
-                    loadingGif.style.width = '100%';
-                    loadingGif.style.height = '100vh';
-                    loadingGif.style.height = 'calc(var(--vh, 1vh) * 100)';
-                    loadingGif.style.minHeight = '100vh';
-                    loadingGif.style.minHeight = 'calc(var(--vh, 1vh) * 100)';
-                    loadingGif.style.objectFit = 'cover';
-                    loadingGif.style.objectPosition = 'center';
-                    loadingGif.style.margin = '0';
-                    loadingGif.style.padding = '0';
-                    console.log('设置111.gif源文件和样式');
+                    console.log('设置111.gif源文件');
                 }
                 
                 // 微信浏览器特殊处理：用户点击后取消静音
