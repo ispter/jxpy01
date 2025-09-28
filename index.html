@@ -1067,6 +1067,10 @@
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;border:2px solid transparent;border-radius:6px;background:linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent) border-box;animation:borderGlow 2s ease-in-out infinite alternate;pointer-events:none;"></div>
         </button>
         
+        <!-- ICP Hot Area (Hidden initially) -->
+        <div id="icpHotArea" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:200px;height:20px;background:transparent;cursor:pointer;z-index:4;opacity:0;transition:opacity 0.3s ease;" onclick="window.open('https://beian.miit.gov.cn/', '_blank')" title="京ICP备 2025140930号-2">
+        </div>
+        
 
         <div style="display:none"><audio id="bgMusic" src="mp3/bg.mp3" preload="auto"></audio></div>
     </div>
@@ -1430,6 +1434,7 @@
         <!-- Footer Section -->
         <footer class="footer">
             <p>探索千年非遗文化的魅力&nbsp;&nbsp;&nbsp;&nbsp;感受光影交织的传统艺术</p>
+            <p><a href="https://beian.miit.gov.cn/" target="_blank" style="color: #8B4513; text-decoration: none;">京ICP备 2025140930号-2</a></p>
         </footer>
     </div>
 
@@ -1881,6 +1886,13 @@
                     console.log('重新显示info按钮');
                 }
                 
+                // 隐藏ICP热区，因为用户已进入主内容区域
+                const icpHotArea = document.getElementById('icpHotArea');
+                if (icpHotArea) {
+                    icpHotArea.style.opacity = '0';
+                    console.log('隐藏ICP热区');
+                }
+                
                 console.log('111.gif淡出完成，显示所有视频内容，恢复正常滚动');
                 console.log('滚动事件监听器已移除，页面可以正常滚动');
                 console.log('body overflow:', document.body.style.overflow);
@@ -1939,6 +1951,13 @@
                 if (enterBtn) {
                     enterBtn.style.opacity = '1';
                     console.log('按钮淡入显示');
+                }
+                
+                // 同时显示ICP热区
+                const icpHotArea = document.getElementById('icpHotArea');
+                if (icpHotArea) {
+                    icpHotArea.style.opacity = '1';
+                    console.log('ICP热区已显示');
                 }
             }, 2000); // 从3500ms减少到2000ms
         });
@@ -2064,6 +2083,13 @@
                 if (infoBtn) {
                     infoBtn.style.display = 'none';
                     console.log('隐藏info按钮');
+                }
+                
+                // 确保ICP热区在111.gif播放期间保持可见
+                const icpHotArea = document.getElementById('icpHotArea');
+                if (icpHotArea) {
+                    icpHotArea.style.opacity = '1';
+                    console.log('111.gif播放期间保持ICP热区可见');
                 }
                 
                 // 开始播放音乐和动画
